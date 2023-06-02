@@ -31,7 +31,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.kafka:spring-kafka'
 
     // mysql
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -50,9 +49,6 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // kafka
-    implementation 'org.springframework.kafka:spring-kafka'
 
     // chatgpt
     implementation group: 'com.theokanning.openai-gpt3-java', name: 'client', version: '0.9.0'
