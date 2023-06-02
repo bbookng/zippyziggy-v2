@@ -72,9 +72,6 @@ public class PromptService{
 
 		promptRepository.save(prompt);
 
-		// 생성 시 search 서비스에 Elasticsearch INSERT 요청
-		kafkaProducer.send("create-prompt-topic", prompt.toEsPromptRequest());
-
 		return PromptResponse.from(prompt);
 	}
 
@@ -107,9 +104,6 @@ public class PromptService{
 		prompt.setDescription(data.getDescription());
 		prompt.setCategory(data.getCategory());
 
-		// 수정 시 search 서비스에 Elasticsearch UPDATE 요청
-		kafkaProducer.send("update-prompt-topic", prompt.toEsPromptRequest());
-
 		return PromptResponse.from(prompt);
 	}
 
@@ -139,10 +133,6 @@ public class PromptService{
 			response.addCookie(newCookie);
 			result = promptRepository.updateHit(promptId);
 		}
-
-		// Elasticsearch에 조회수 반영
-		final PromptCntRequest promptCntRequest = prompt.toPromptHitRequest();
-		kafkaProducer.sendPromptCnt("sync-prompt-hit", promptCntRequest);
 
 		return result;
 	}
@@ -325,9 +315,10 @@ public class PromptService{
     /*
     로그인한 유저가 좋아요를 누른 프롬프트 조회하기, PromptCard 타입의 리스트 형식으로 응답
      */
-	public PromptCardListResponse likePromptsByMember (String crntMemberUuid, Pageable pageable) {
+	public PromptCardListResponse likePromptsByMember (Pageable pageable) {
+		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
 
-		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		final long totalPromptsCnt = prompts.getTotalElements();
 		final int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
@@ -340,8 +331,8 @@ public class PromptService{
 			MemberResponse writerInfo = getWriterInfo(prompt.getMemberUuid());
 
 			// 좋아요, 북마크 여부
-			boolean isBookmarked = promptBookmarkRepository.findByMemberUuidAndPrompt(UUID.fromString(crntMemberUuid),prompt).isPresent();
-			boolean isOriginLiked = promptLikeRepository.findByPromptAndMemberUuid(prompt, UUID.fromString(crntMemberUuid)).isPresent();
+			boolean isBookmarked = promptBookmarkRepository.findByMemberUuidAndPrompt(crntMemberUuid,prompt).isPresent();
+			boolean isOriginLiked = promptLikeRepository.findByPromptAndMemberUuid(prompt, crntMemberUuid).isPresent();
 
 			PromptCardResponse promptCardResponse = PromptCardResponse.from(writerInfo, prompt, commentCnt, forkCnt, talkCnt, isBookmarked, isOriginLiked);
 			promptCardResponses.add(promptCardResponse);
@@ -372,9 +363,10 @@ public class PromptService{
 	/*
     북마크 조회하기
      */
-	public PromptCardListResponse bookmarkPromptByMember(String crntMemberUuid, Pageable pageable) {
+	public PromptCardListResponse bookmarkPromptByMember(Pageable pageable) {
+		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		final long totalPromptsCnt = prompts.getTotalElements();
 		final int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
@@ -386,8 +378,8 @@ public class PromptService{
 
 			MemberResponse writerInfo = getWriterInfo(prompt.getMemberUuid());
 
-			boolean isBookmarded = promptBookmarkRepository.findByMemberUuidAndPrompt(UUID.fromString(crntMemberUuid), prompt).isPresent();
-			boolean isLiked = promptLikeRepository.findByPromptAndMemberUuid(prompt, UUID.fromString(crntMemberUuid)).isPresent();
+			boolean isBookmarded = promptBookmarkRepository.findByMemberUuidAndPrompt(crntMemberUuid, prompt).isPresent();
+			boolean isLiked = promptLikeRepository.findByPromptAndMemberUuid(prompt, crntMemberUuid).isPresent();
 
 			PromptCardResponse promptCardResponse = PromptCardResponse.from(writerInfo, prompt, commentCnt, forkCnt, talkCnt, isBookmarded, isLiked);
 			promptCardResponses.add(promptCardResponse);
@@ -417,7 +409,8 @@ public class PromptService{
 	/*
     프롬프트 톡 및 댓글 개수 조회
      */
-	public SearchPromptResponse searchPrompt(UUID promptUuid, String crntMemberUuid) {
+	public SearchPromptResponse searchPrompt(UUID promptUuid) {
+		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
 
 		final Prompt prompt = promptRepository
 			.findByPromptUuid(promptUuid)
@@ -433,7 +426,7 @@ public class PromptService{
 			isLiked = false;
 			isBookmarked = false;
 		} else {
-			UUID memberUuid = UUID.fromString(crntMemberUuid);
+			UUID memberUuid = crntMemberUuid;
 			isLiked = promptLikeRepository
 				.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
 			isBookmarked = promptBookmarkRepository
