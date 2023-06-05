@@ -1,16 +1,12 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://jayl2.me:13306/zippyziggy?serverTimezone=Asia/Seoul&useSSL=false
-    username: root
-    password: jaylee15@
+    url: jdbc:mysql://zippyziggy.kr:3306/zippyziggy?serverTimezone=Asia/Seoul&useSSL=false
+    username: deundeun
+    password: tmp
   jpa:
     hibernate:
       ddl-auto: create
-  redis:
-    port: 6382
-    host: zippyziggy.kr
-    password: zippyziggy
   servlet:
     multipart:
       max-file-size: 10MB
@@ -19,47 +15,3 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-
-jwt:
-  secret:
-    key: zippyziggy1234567890zippyziggy1234567890zippyziggy1234567890e205
-  access:
-    token:
-      expiration:
-        time: 10000000
-  refresh:
-    token:
-      expiration:
-        time: 100000000
-
-kakao:
-  client:
-    id: caeb5575d99036003c187adfadea9863
-  # redirect:
-  # uri: http://localhost:3000/account/oauth
-  # logout:
-  #   redirect:
-  #     uri: http://localhost:3000
-
-google:
-  client:
-    id: 972594831157-fdfm8rq46vrb3tl81ds49o5978hs2ld0.apps.googleusercontent.com
-  secret:
-    key: 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
-  # redirect:
-  #   url: http://localhost:3000/members/login/oauth2/code/google
-
-cloud:
-  aws:
-    credentials:
-      access-key: AKIAR2XZF4GZCW4QKL2Q
-      secret-key: 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
-    s3:
-      bucket: zippyziggy
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
-
-chatgpt:
-  api-key: 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
