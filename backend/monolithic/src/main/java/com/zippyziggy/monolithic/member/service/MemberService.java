@@ -4,6 +4,7 @@ import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
 import com.zippyziggy.monolithic.common.util.RedisUtils;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.request.MemberSignUpRequestDto;
+import com.zippyziggy.monolithic.member.dto.response.MemberIdResponse;
 import com.zippyziggy.monolithic.member.dto.response.MemberInformResponseDto;
 import com.zippyziggy.monolithic.member.model.JwtToken;
 import com.zippyziggy.monolithic.member.model.Member;
@@ -17,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.NonUniqueResultException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -211,6 +214,18 @@ public class MemberService {
         redisService.saveRedisData(member.getUserUuid().toString(), MemberInformResponseDto.from(member), member.getRefreshToken());
 
         return member;
+    }
+
+    public List<MemberIdResponse> findAll() {
+        return memberRepository
+                .findAll()
+                .stream()
+                .map(m -> MemberIdResponse.from(m))
+                .collect(Collectors.toList());
+    }
+
+    public Long findLongIdByMemberUuid(String memberUuid) {
+        return memberRepository.findByUserUuid(UUID.fromString(memberUuid)).getId();
     }
 
 }
