@@ -2,7 +2,6 @@ package com.zippyziggy.monolithic.prompt.service;
 
 import com.zippyziggy.monolithic.common.aws.AwsS3Uploader;
 import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
-import com.zippyziggy.monolithic.common.util.RedisUtils;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.response.MemberResponse;
 import com.zippyziggy.monolithic.member.model.Member;
@@ -53,7 +52,6 @@ public class PromptService{
 	private final KafkaProducer kafkaProducer;
 	private final PromptClickRepository promptClickRepository;
 	private final ChatgptService chatgptService;
-	private final RedisUtils redisUtils;
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
 
@@ -561,20 +559,14 @@ public class PromptService{
 	}
 
 	private MemberResponse getMemberInfo(UUID memberUuid) {
-		if (redisUtils.isExists("member" + memberUuid)) {
-			log.info("redis로 회원 조회 중");
-			MemberResponse memberResponse = redisUtils.get("member" + memberUuid, MemberResponse.class);
-			return memberResponse;
 
-		} else {
-			log.info("DB로 회원 조회 중");
-			log.info("userUuid = " + memberUuid);
-			Member member = memberRepository.findByUserUuid(memberUuid);
-			log.info("member = " + member);
+		log.info("DB로 회원 조회 중");
+		log.info("userUuid = " + memberUuid);
+		Member member = memberRepository.findByUserUuid(memberUuid);
+		log.info("member = " + member);
 
-			MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
+		MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
 
-			return memberResponse;
-		}
+		return memberResponse;
 	}
 }

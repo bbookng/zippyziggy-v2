@@ -1,10 +1,9 @@
 package com.zippyziggy.monolithic.member.service;
 
 import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
-import com.zippyziggy.monolithic.common.util.RedisUtils;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.request.MemberSignUpRequestDto;
-import com.zippyziggy.monolithic.member.dto.response.MemberInformResponseDto;
+import com.zippyziggy.monolithic.member.dto.response.MemberIdResponse;
 import com.zippyziggy.monolithic.member.model.JwtToken;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.model.Platform;
@@ -17,8 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.NonUniqueResultException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +30,10 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtProviderService jwtProviderService;
-    private final RedisService redisService;
+//    private final RedisService redisService;
     private final S3Service s3Service;
     private final SecurityUtil securityUtil;
     private final KafkaProducer kafkaProducer;
-    private final RedisUtils redisUtils;
 
 
     /**
@@ -159,25 +159,11 @@ public class MemberService {
 
         Member member = securityUtil.getCurrentMember();
 
-        redisService.deleteRedisData(member.getUserUuid().toString());
-
         kafkaProducer.send("delete-member-topic", member.getUserUuid());
         memberRepository.delete(member);
 //        member.setActivate(false);
 //        member.setNickname("");
 //        member.setRefreshToken(null);
-
-        // 기존에 있던 redis 정보 삭제
-        String MemberKey = "member" + member.getUserUuid();
-        String RefreshKey = "refreshToken" + member.getUserUuid();
-
-        if (redisUtils.isExists(MemberKey)) {
-            redisUtils.delete(MemberKey);
-        }
-
-        if (redisUtils.isExists(RefreshKey)) {
-            redisUtils.delete(RefreshKey);
-        }
 
         s3Service.deleteS3File(member.getProfileImg());
 
@@ -207,10 +193,19 @@ public class MemberService {
             throw new NullPointerException("입력된 값이 없습니다.");
         }
 
-        // redis 내용도 함께 수정
-        redisService.saveRedisData(member.getUserUuid().toString(), MemberInformResponseDto.from(member), member.getRefreshToken());
-
         return member;
+    }
+
+    public List<MemberIdResponse> findAll() {
+        return memberRepository
+                .findAll()
+                .stream()
+                .map(m -> MemberIdResponse.from(m))
+                .collect(Collectors.toList());
+    }
+
+    public Long findLongIdByMemberUuid(String memberUuid) {
+        return memberRepository.findByUserUuid(UUID.fromString(memberUuid)).getId();
     }
 
 }

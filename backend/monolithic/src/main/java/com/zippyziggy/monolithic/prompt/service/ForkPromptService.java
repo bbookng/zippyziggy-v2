@@ -2,7 +2,6 @@ package com.zippyziggy.monolithic.prompt.service;
 
 import com.zippyziggy.monolithic.common.aws.AwsS3Uploader;
 import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
-import com.zippyziggy.monolithic.common.util.RedisUtils;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.response.MemberResponse;
 import com.zippyziggy.monolithic.member.model.Member;
@@ -22,13 +21,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,7 +44,6 @@ public class ForkPromptService {
 	private final KafkaProducer kafkaProducer;
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
-	private final RedisUtils redisUtils;
 
 	public ForkPromptResponse createForkPrompt(UUID promptUuid, PromptRequest data, MultipartFile thumbnail) {
 
@@ -112,20 +108,14 @@ public class ForkPromptService {
 		return promptDtoList;
 	}
 	private MemberResponse getMemberInfo(UUID memberUuid) {
-		if (redisUtils.isExists("member" + memberUuid)) {
-			log.info("redis로 회원 조회 중");
-			MemberResponse memberResponse = redisUtils.get("member" + memberUuid, MemberResponse.class);
-			return memberResponse;
 
-		} else {
-			log.info("DB로 회원 조회 중");
-			log.info("userUuid = " + memberUuid);
-			Member member = memberRepository.findByUserUuid(memberUuid);
-			log.info("member = " + member);
+		log.info("DB로 회원 조회 중");
+		log.info("userUuid = " + memberUuid);
+		Member member = memberRepository.findByUserUuid(memberUuid);
+		log.info("member = " + member);
 
-			MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
+		MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
 
-			return memberResponse;
-		}
+		return memberResponse;
 	}
 }
