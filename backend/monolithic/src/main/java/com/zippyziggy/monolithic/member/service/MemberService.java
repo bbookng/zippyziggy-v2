@@ -4,6 +4,10 @@ import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.request.MemberSignUpRequestDto;
 import com.zippyziggy.monolithic.member.dto.response.MemberIdResponse;
+<<<<<<< HEAD
+=======
+import com.zippyziggy.monolithic.member.dto.response.MemberInformResponseDto;
+>>>>>>> 7e917040d4080b68038b48ef0c3025b5416be0a4
 import com.zippyziggy.monolithic.member.model.JwtToken;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.model.Platform;

@@ -2,6 +2,7 @@ package com.zippyziggy.monolithic.member.controller;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.zippyziggy.monolithic.common.util.CookieUtils;
+
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.request.MemberSignUpRequestDto;
 import com.zippyziggy.monolithic.member.dto.response.*;
@@ -12,6 +13,7 @@ import com.zippyziggy.monolithic.member.repository.MemberRepository;
 import com.zippyziggy.monolithic.member.repository.VisitedMemberCountRepository;
 import com.zippyziggy.monolithic.member.service.*;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardListResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -53,6 +55,7 @@ public class MemberController {
     private final VisitedMemberCountRepository visitedMemberCountRepository;
 
     private final SecurityUtil securityUtil;
+
     private final CookieUtils cookieUtils;
 
     private final MemberRepository memberRepository;
@@ -90,6 +93,7 @@ public class MemberController {
 //        }
 //    }
 
+
     /**
      * 일일 방문자수 조회
      */
@@ -115,6 +119,7 @@ public class MemberController {
 //        }
 //    }
 
+
     /**
      * 해당 월의 총 일일 방문자 수 조회
      */
@@ -133,6 +138,7 @@ public class MemberController {
 //        }
 //        return ResponseEntity.ok(monthlyVisitedCountList);
 //    }
+
 
     /**
      * refreshToken이 있는지 확인
@@ -211,6 +217,7 @@ public class MemberController {
 //        }
 //    }
 
+
     /**
      * 멤버가 좋아요를 누름 프롬프트 조회
      */
@@ -229,6 +236,7 @@ public class MemberController {
 //        return ResponseEntity.ok(promptsLike);
 //
 //    }
+
 
     /**
      * 멤버가 북마크를 누른 프롬프트 조회
@@ -252,6 +260,7 @@ public class MemberController {
 //        return ResponseEntity.ok(promptsBookmark);
 //    }
 
+
     /**
      * 멤버가 북마크를 누른 프롬프트 조회(extension)
      */
@@ -273,6 +282,7 @@ public class MemberController {
 //                .orElseThrow(NotExistPromptList::new);
 //        return ResponseEntity.ok(promptCardListExtensionResponse);
 //    }
+
 
     /**
      * 멤버가 생성한 프롬프트 조회
@@ -319,6 +329,7 @@ public class MemberController {
 //
 //        }
 //    }
+
 
     /**
      * 카카오 로그인
@@ -383,11 +394,13 @@ public class MemberController {
 //                redisUtils.increaseTotalVisitedCount();
 //            }
 
+
             // 로그인 시 최소한의 유저 정보 전달
             MemberInformResponseDto memberInformResponseDto = MemberInformResponseDto.from(member);
             log.info("memberInformResponseDto = " + memberInformResponseDto);
 
 //            redisService.saveRedisData(member.getUserUuid().toString(), memberInformResponseDto, jwtToken.getRefreshToken());
+
 
             ///////////////////////////////레디스/////////////////////////////////
 
@@ -470,6 +483,7 @@ public class MemberController {
 //            // redis 설정(1. 유저 정보 저장 -> UUID나 AccessToken으로 회원 조회할 시 활용
 //            //           2. refreshToken 저장 -> accessToken 만료 시 DB가 아닌 Redis에서 먼저 찾아오기)
 //            redisService.saveRedisData(member.getUserUuid().toString(), memberInformResponseDto, jwtToken.getRefreshToken());
+
             ///////////////////////////////레디스/////////////////////////////////
             return ResponseEntity.ok()
                     .headers(headers)
@@ -539,6 +553,7 @@ public class MemberController {
 
         ///////////////////////////////레디스/////////////////////////////////
 
+
 //        String dateTimeDaily = visitedMemberCountService.DateTimeDaily();
         // 방문한 사람이 있는지 확인
 //        if (redisUtils.isExists(dateTimeDaily)) {
@@ -559,6 +574,7 @@ public class MemberController {
 //        // redis 설정(1. 유저 정보 저장 -> UUID나 AccessToken으로 회원 조회할 시 활용
 //        //           2. refreshToken 저장 -> accessToken 만료 시 DB가 아닌 Redis에서 먼저 찾아오기)
 //        redisService.saveRedisData(member.getUserUuid().toString(), memberInformResponseDto, jwtToken.getRefreshToken());
+
         ///////////////////////////////레디스/////////////////////////////////
 
         return ResponseEntity.ok()
@@ -583,7 +599,9 @@ public class MemberController {
         member.setRefreshToken(null);
 
         // 기존에 있던 redis 정보 삭제
+
 //        redisService.deleteRedisData(member.getUserUuid().toString());
+
 
         // Kakao 계정도 함께 로그아웃 진행
         if (member.getPlatform().equals(Platform.KAKAO)) {
@@ -644,6 +662,7 @@ public class MemberController {
                     .isSignUp(false)
                     .memberInformResponseDto(memberInformResponseDto).build();
 
+
 //            String dateTimeDaily = visitedMemberCountService.DateTimeDaily();
 //            // 방문한 사람이 있는지 확인
 //            if (redisUtils.isExists(dateTimeDaily)) {
@@ -663,6 +682,7 @@ public class MemberController {
 //
 //            // Redis에 refreshToken과 유저 정보 저장
 //            redisService.saveRedisData(member.getUserUuid().toString(), memberInformResponseDto, jwtToken.getRefreshToken());
+
 
             return ResponseEntity.ok()
                     .headers(headers)
@@ -720,6 +740,7 @@ public class MemberController {
 //
 //        // Redis에 refreshToken과 유저 정보 저장
 //        redisService.saveRedisData(member.getUserUuid().toString(), memberInformResponseDto, jwtToken.getRefreshToken());
+
 
         return ResponseEntity.ok(appMemberResponse);
 
@@ -836,6 +857,7 @@ public class MemberController {
 
         return new ResponseEntity<>(memberResponse, HttpStatus.OK);
 
+
     }
 
 
@@ -894,6 +916,7 @@ public class MemberController {
 //        final MemberTalkList memberTalkList = promptClient.getTalks(crntMemberUuid, pageable);
 //        return ResponseEntity.ok(memberTalkList);
 //    }
+
 
     @GetMapping("/ids")
     public ResponseEntity<List<MemberIdResponse>> findAllMemberIds() {
