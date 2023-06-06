@@ -1,12 +1,10 @@
 package com.zippyziggy.monolithic.talk.service;
 
-import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.response.MemberResponse;
 import com.zippyziggy.monolithic.member.dto.response.WriterResponse;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.repository.MemberRepository;
-import com.zippyziggy.monolithic.prompt.dto.request.TalkCntRequest;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardResponse;
 import com.zippyziggy.monolithic.prompt.exception.ForbiddenMemberException;
 import com.zippyziggy.monolithic.prompt.exception.PromptNotFoundException;
@@ -60,7 +58,6 @@ public class TalkService {
 	private final PromptLikeRepository promptLikeRepository;
 	private final MessageRepository messageRepository;
 	private final TalkCommentRepository talkCommentRepository;
-	private final KafkaProducer kafkaProducer;
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
 
@@ -85,9 +82,6 @@ public class TalkService {
 				.orElseThrow(PromptNotFoundException::new));
 		}
 
-		// 생성 시 search 서비스에 Elasticsearch INSERT 요청
-		kafkaProducer.sendTalkCreateMessage("create-talk-topic", talk.toEsTalkRequest());
-
 		return talk.toTalkResponse();
 	}
 
@@ -103,7 +97,6 @@ public class TalkService {
 		} else {
 			isLiked = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, crntMemberUuid);
 		}
-
 
 		MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
 
@@ -151,7 +144,6 @@ public class TalkService {
 
 	public List<TalkListResponse> getTalkListResponses(Prompt originPrompt,  Pageable pageable) {
 
-
 		List<Talk> talks = talkRepository.findAllByPromptPromptUuid(originPrompt.getPromptUuid(), pageable).toList();
 
 		List<TalkListResponse> talkListResponses = getTalks(talks);
@@ -160,32 +152,31 @@ public class TalkService {
 	}
 
 	public List<TalkListResponse> getTalks(List<Talk> talks) {
-		List<TalkListResponse> talkListResponses = talks.stream().map(t -> {
-			String crntMemberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
+		List<TalkListResponse> talkListResponses = talks.stream().map(talk -> {
+			Member currentMember = securityUtil.getCurrentMember();
+			String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 			boolean isTalkLiked;
 
-			if (crntMemberUuid.equals("defaultValue")) {
+			if (crntMemberUuid == null) {
 				isTalkLiked = false;
 			} else {
 				isTalkLiked = talkLikeRepository
-						.findByTalk_IdAndMemberUuid(t.getId(), UUID.fromString(crntMemberUuid)) != null ? true : false;
+						.findByTalk_IdAndMemberUuid(talk.getId(), UUID.fromString(crntMemberUuid)).isPresent();
 			}
-			Long talkLikeCnt = talkLikeRepository.countAllByTalkId(t.getId());
-			Long talkCommentCnt = talkCommentRepository.countAllByTalk_Id(t.getId());
-			String question = messageRepository.findFirstByTalkIdAndRole(t.getId(), Role.USER).getContent().toString();
-			String answer = messageRepository.findFirstByTalkIdAndRole(t.getId(), Role.ASSISTANT).getContent().toString();
-			MemberResponse memberResponse = getMemberInfo(t.getMemberUuid());
+			Long talkLikeCnt = talkLikeRepository.countAllByTalkId(talk.getId());
+			Long talkCommentCnt = talkCommentRepository.countAllByTalk_Id(talk.getId());
+			String question = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.USER).getContent().toString();
+			String answer = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.ASSISTANT).getContent().toString();
+			MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
 
-			return TalkListResponse.from(
-				t.getId(),
-				t.getTitle(),
-				question,
-				answer,
-				memberResponse,
-				talkLikeCnt,
-				talkCommentCnt,
-				isTalkLiked);
+			return talk.from(
+					question,
+					answer,
+					memberResponse,
+					talkLikeCnt,
+					talkCommentCnt,
+					isTalkLiked);
 
 		}).collect(Collectors.toList());
 		return talkListResponses;
@@ -199,9 +190,6 @@ public class TalkService {
 		if (!crntMemberUuid.equals(talk.getMemberUuid())) {
 			throw new ForbiddenMemberException();
 		}
-
-		// 삭제 시 search 서비스에 Elasticsearch DELETE 요청
-		kafkaProducer.sendTalkDeleteMessage("delete-talk-topic", talk.getId());
 
 		talkRepository.delete(talk);
 	}
@@ -240,10 +228,6 @@ public class TalkService {
 			talkRepository.save(talk);
 		}
 
-		// Elasticsearch에 좋아요 수 반영
-		TalkCntRequest talkCntRequest = new TalkCntRequest(talkId, talk.getLikeCnt());
-		kafkaProducer.sendTalkCnt("sync-talk-like-cnt", talkCntRequest);
-
 	}
 
     public Long findCommentCnt(Long talkId) {
@@ -273,10 +257,6 @@ public class TalkService {
 			response.addCookie(newCookie);
 			result = talkRepository.updateHit(talkId);
 		}
-
-		// Elasticsearch에 조회수 반영
-		final TalkCntRequest talkCntRequest = new TalkCntRequest(talkId, talk.getHit());
-		kafkaProducer.sendTalkCnt("sync-talk-hit", talkCntRequest);
 
 		return result;
 	}
@@ -334,8 +314,9 @@ public class TalkService {
 		Member member = memberRepository.findByUserUuid(memberUuid);
 		log.info("member = " + member);
 
-		MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
-
+		MemberResponse memberResponse = (null == member)
+				? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
+				: MemberResponse.from(member);
 		return memberResponse;
 	}
 }

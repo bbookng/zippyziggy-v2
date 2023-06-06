@@ -16,6 +16,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MemberResponse {
 
+    public MemberResponse(String nickname, String profileImg) {
+        this.nickname = nickname;
+        this.profileImg = profileImg;
+    }
+
     private String nickname;
     private String profileImg;
     private UUID userUuid;

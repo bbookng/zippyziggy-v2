@@ -6,6 +6,7 @@ import com.zippyziggy.monolithic.talk.dto.request.EsTalkRequest;
 import com.zippyziggy.monolithic.talk.dto.request.TalkRequest;
 import com.zippyziggy.monolithic.talk.dto.response.MessageResponse;
 import com.zippyziggy.monolithic.talk.dto.response.TalkDetailResponse;
+import com.zippyziggy.monolithic.talk.dto.response.TalkListResponse;
 import com.zippyziggy.monolithic.talk.dto.response.TalkResponse;
 import lombok.*;
 
@@ -46,6 +47,8 @@ public class Talk {
 
 	@OneToMany(mappedBy = "talk", cascade = CascadeType.ALL)
 	private List<Message> messages;
+
+	private String model;
 
 	public void setPrompt(Prompt prompt) {
 		this.prompt = prompt;
@@ -117,6 +120,27 @@ public class Talk {
 				.likeCnt(this.likeCnt)
 				.hit(this.hit)
 				.esMessages(messageResponses)
+				.build();
+	}
+
+	public TalkListResponse from(
+			String question,
+			String answer,
+			MemberResponse member,
+			Long likeCnt,
+			Long commentCnt,
+			Boolean isLiked
+	) {
+		return TalkListResponse.builder()
+				.talkId(this.id)
+				.title(this.title)
+				.model(this.model)
+				.question(question)
+				.answer(answer)
+				.writer(member.toWriterResponse())
+				.likeCnt(likeCnt)
+				.commentCnt(commentCnt)
+				.isLiked(isLiked)
 				.build();
 	}
 }

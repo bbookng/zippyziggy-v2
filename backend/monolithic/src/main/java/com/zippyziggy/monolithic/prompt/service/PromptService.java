@@ -1,11 +1,11 @@
 package com.zippyziggy.monolithic.prompt.service;
 
 import com.zippyziggy.monolithic.common.aws.AwsS3Uploader;
-import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.response.MemberResponse;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.repository.MemberRepository;
+import com.zippyziggy.monolithic.notice.service.AlarmService;
 import com.zippyziggy.monolithic.prompt.dto.request.*;
 import com.zippyziggy.monolithic.prompt.dto.response.*;
 import com.zippyziggy.monolithic.prompt.exception.*;
@@ -15,12 +15,14 @@ import com.zippyziggy.monolithic.talk.dto.response.PromptTalkListResponse;
 import com.zippyziggy.monolithic.talk.dto.response.TalkListResponse;
 import com.zippyziggy.monolithic.talk.repository.TalkRepository;
 import com.zippyziggy.monolithic.talk.service.TalkService;
-import io.github.flashvayne.chatgpt.service.ChatgptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
@@ -39,8 +41,17 @@ import java.util.UUID;
 @Slf4j
 public class PromptService{
 
+
 	private static final String VIEWCOOKIENAME = "alreadyViewCookie";
+	private static final String MODEL = "gpt-3.5-turbo";
+	private static final String URL = "https://api.openai.com/v1/chat/completions";
+
+	@Qualifier("openaiRestTemplate")
+	@Autowired
+	private RestTemplate restTemplate;
+
 	private final AwsS3Uploader awsS3Uploader;
+
 	private final PromptRepository promptRepository;
 	private final PromptLikeRepository promptLikeRepository;
 	private final PromptBookmarkRepository promptBookmarkRepository;
@@ -49,11 +60,11 @@ public class PromptService{
 	private final TalkRepository talkRepository;
 	private final RatingRepository ratingRepository;
 	private final PromptReportRepository promptReportRepository;
-	private final KafkaProducer kafkaProducer;
 	private final PromptClickRepository promptClickRepository;
-	private final ChatgptService chatgptService;
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
+	private final AlarmService alarmService;
+
 
 	// Exception 처리 필요
 	public PromptResponse createPrompt(PromptRequest data, MultipartFile thumbnail) {
@@ -73,7 +84,7 @@ public class PromptService{
 		return PromptResponse.from(prompt);
 	}
 
-	public PromptResponse modifyPrompt(UUID promptUuid, PromptModifyRequest data, MultipartFile thumbnail) {
+	public PromptResponse modifyPrompt(UUID promptUuid, PromptRequest data, MultipartFile thumbnail) {
 		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
@@ -87,10 +98,10 @@ public class PromptService{
 		if (thumbnail == null) {
 			try {
 				awsS3Uploader.delete("thumbnails/", prompt.getThumbnail());
-				prompt.setThumbnail("default thumbnail url");
 			} catch (RuntimeException e) {
 				throw new AwsUploadException("삭제하는데 실패하였습니다.");
 			}
+			prompt.setThumbnail("https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noCardImg.png");
 
 		} else {
 			awsS3Uploader.delete("thumbnails/", prompt.getThumbnail());
@@ -101,6 +112,10 @@ public class PromptService{
 		prompt.setTitle(data.getTitle());
 		prompt.setDescription(data.getDescription());
 		prompt.setCategory(data.getCategory());
+		prompt.setUpdDt(LocalDateTime.now());
+		prompt.setPrefix(data.getMessage().getPrefix());
+		prompt.setExample(data.getMessage().getExample());
+		prompt.setSuffix(data.getMessage().getSuffix());
 
 		return PromptResponse.from(prompt);
 	}
@@ -156,7 +171,8 @@ public class PromptService{
 	}
 
 	public PromptDetailResponse getPromptDetail(UUID promptUuid) {
-		String crntMemberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
+		Member currentMember = securityUtil.getCurrentMember();
+		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 		final Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
@@ -165,13 +181,12 @@ public class PromptService{
 		boolean isLiked;
 		boolean isBookmarked;
 
-		if (crntMemberUuid.equals("defaultValue")) {
+		if (crntMemberUuid == null) {
 			isLiked = false;
 			isBookmarked = false;
 		} else {
 			isBookmarked = promptBookmarkRepository.findByMemberUuidAndPrompt(UUID.fromString(crntMemberUuid), prompt).isPresent();
 			isLiked =  promptLikeRepository.findByPromptAndMemberUuid(prompt, UUID.fromString(crntMemberUuid)).isPresent();
-
 		}
 
 		PromptDetailResponse promptDetailResponse = prompt.toDetailResponse(isLiked, isBookmarked);
@@ -205,7 +220,7 @@ public class PromptService{
 					.getTitle());
 		}
 
-		if (!crntMemberUuid.equals("defaultValue")) {
+		if (crntMemberUuid != null) {
 			// 프롬프트 조회 시 최근 조회 테이블에 추가
 			final PromptClick promptClick = PromptClick.from(prompt, UUID.fromString(crntMemberUuid));
 			promptClickRepository.save(promptClick);
@@ -242,8 +257,6 @@ public class PromptService{
 		prompt.setStatusCode(StatusCode.DELETED);
 		promptRepository.save(prompt);
 
-		// 삭제 시 search 서비스에 Elasticsearch DELETE 요청
-		kafkaProducer.sendDeleteMessage("delete-prompt-topic", promptUuid);
 	}
 
     /*
@@ -276,6 +289,10 @@ public class PromptService{
 			prompt.setLikeCnt(prompt.getLikeCnt() + 1);
 			promptRepository.save(prompt);
 
+			alarmService.send(prompt.getMemberUuid().toString(),
+					"'" + prompt.getTitle() + "'" + "게시물 좋아요 + 1",
+					"https://zippyziggy.kr/prompts/" + prompt.getPromptUuid().toString());
+
 		} else {
 
 			// 프롬프트 - 사용자 좋아요 취소
@@ -286,9 +303,6 @@ public class PromptService{
 			promptRepository.save(prompt);
 		}
 
-		// Elasticsearch에 좋아요 수 반영
-		final PromptCntRequest promptCntRequest = prompt.toPromptLikeCntRequest();
-		kafkaProducer.sendPromptCnt("sync-prompt-like-cnt", promptCntRequest);
 	}
 
     /*
@@ -387,6 +401,46 @@ public class PromptService{
 	}
 
 	/*
+    북마크 조회하기(extension)
+     */
+	public PromptCardListExtensionResponse bookmarkPromptByMemberAndExtension(String crntMemberUuid, Pageable pageable) {
+		log.info(String.valueOf(pageable.getSort()));
+
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+		long totalPromptsCnt = prompts.getTotalElements();
+		int totalPageCnt = prompts.getTotalPages();
+
+
+		List<PromptBookmarkResponse> promptBookmarkResponses = new ArrayList<>();
+
+		for (Prompt prompt : prompts) {
+			long commentCnt = promptCommentRepository.countAllByPromptPromptUuid(prompt.getPromptUuid());
+			long forkCnt = promptRepository.countAllByOriginPromptUuidAndStatusCode(prompt.getPromptUuid(), StatusCode.OPEN);
+			long talkCnt = talkRepository.countAllByPromptPromptUuid(prompt.getPromptUuid());
+
+			Member member = memberRepository.findByUserUuid(prompt.getMemberUuid());
+			log.info("member = " + member);
+
+			MemberResponse writerInfo = (null == member)
+					? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
+					: MemberResponse.from(member);
+
+			boolean isBookmarked = promptBookmarkRepository.findByMemberUuidAndPrompt(UUID.fromString(crntMemberUuid), prompt) != null
+					? true : false;
+			boolean isLiked = promptLikeRepository.findByPromptAndMemberUuid(prompt, UUID.fromString(crntMemberUuid)) != null
+					? true : false;
+
+			PromptBookmarkResponse promptCardResponse = PromptBookmarkResponse.from(writerInfo, prompt, commentCnt, forkCnt, talkCnt, isBookmarked, isLiked);
+			promptBookmarkResponses.add(promptCardResponse);
+
+		}
+
+		return PromptCardListExtensionResponse.from(totalPromptsCnt, totalPageCnt, promptBookmarkResponses);
+
+	}
+
+
+	/*
     프롬프트 평가
      */
 	public void ratingPrompt(UUID promptUuid, PromptRatingRequest promptRatingRequest) throws Exception {
@@ -408,7 +462,8 @@ public class PromptService{
     프롬프트 톡 및 댓글 개수 조회
      */
 	public SearchPromptResponse searchPrompt(UUID promptUuid) {
-		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
+		Member currentMember = securityUtil.getCurrentMember();
+		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 		final Prompt prompt = promptRepository
 			.findByPromptUuid(promptUuid)
@@ -420,11 +475,11 @@ public class PromptService{
 
 		boolean isLiked;
 		boolean isBookmarked;
-		if (crntMemberUuid.equals("defaultValue")) {
+		if (crntMemberUuid == null) {
 			isLiked = false;
 			isBookmarked = false;
 		} else {
-			UUID memberUuid = crntMemberUuid;
+			UUID memberUuid = UUID.fromString(crntMemberUuid);
 			isLiked = promptLikeRepository
 				.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
 			isBookmarked = promptBookmarkRepository
@@ -446,6 +501,11 @@ public class PromptService{
 					.orElseThrow(PromptNotFoundException::new);
 			PromptReport promptReport = PromptReport.from(crntMemberUuid, prompt, promptReportRequest.getContent());
 			promptReportRepository.save(promptReport);
+
+			alarmService.send(prompt.getMemberUuid().toString(),
+					"'" + prompt.getTitle() + "'" + "게시물이 신고되었습니다.",
+					"zippyziggy.kr/prompts/" + prompt.getPromptUuid().toString());
+
 		} else {
 			throw new ReportAlreadyExistException();
 		}
@@ -525,26 +585,22 @@ public class PromptService{
 		return PromptCardListResponse.from(totalPromptsCnt, totalPageCnt, promptCardResponses);
 	}
 
-    public GptApiResponse testGptApi(GptApiRequest data) {
+	public GptApiResponse getChatGptAnswer(AppChatGptRequest data) {
+		// create a request
+		ChatGptRequest request = new ChatGptRequest(MODEL, data);
 
-		String prefix = data.getPrefix();
-		String example = data.getExample();
-		String suffix = data.getSuffix();
+		// call the API
+		ChatGptResponse response = restTemplate.postForObject(URL, request, ChatGptResponse.class);
 
-		String apiResult = "";
-
-		if (prefix != null) {
-			apiResult += prefix;
-		}
-		if (example != null) {
-			apiResult += example;
-		}
-		if (suffix != null) {
-			apiResult += suffix;
+		if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+			return new GptApiResponse("No response");
 		}
 
-		return GptApiResponse.from(chatgptService.sendMessage(apiResult));
-    }
+		// return the first response
+		final String answer = response.getChoices().get(0).getMessage().getContent();
+		return new GptApiResponse(answer);
+	}
+
 
 	private MemberResponse getWriterInfo(UUID memberUuid) {
 		MemberResponse writerInfo;
@@ -565,7 +621,9 @@ public class PromptService{
 		Member member = memberRepository.findByUserUuid(memberUuid);
 		log.info("member = " + member);
 
-		MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
+		MemberResponse memberResponse = (null == member)
+				? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
+				: MemberResponse.from(member);
 
 		return memberResponse;
 	}

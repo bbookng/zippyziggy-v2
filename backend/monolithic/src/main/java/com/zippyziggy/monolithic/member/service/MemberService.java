@@ -1,17 +1,26 @@
 package com.zippyziggy.monolithic.member.service;
 
-import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.request.MemberSignUpRequestDto;
 import com.zippyziggy.monolithic.member.dto.response.MemberIdResponse;
-<<<<<<< HEAD
-=======
-import com.zippyziggy.monolithic.member.dto.response.MemberInformResponseDto;
->>>>>>> 7e917040d4080b68038b48ef0c3025b5416be0a4
 import com.zippyziggy.monolithic.member.model.JwtToken;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.model.Platform;
 import com.zippyziggy.monolithic.member.repository.MemberRepository;
+import com.zippyziggy.monolithic.prompt.model.PromptBookmark;
+import com.zippyziggy.monolithic.prompt.model.PromptClick;
+import com.zippyziggy.monolithic.prompt.model.PromptComment;
+import com.zippyziggy.monolithic.prompt.model.PromptLike;
+import com.zippyziggy.monolithic.prompt.repository.PromptBookmarkRepository;
+import com.zippyziggy.monolithic.prompt.repository.PromptClickRepository;
+import com.zippyziggy.monolithic.prompt.repository.PromptCommentRepository;
+import com.zippyziggy.monolithic.prompt.repository.PromptLikeRepository;
+import com.zippyziggy.monolithic.talk.model.Talk;
+import com.zippyziggy.monolithic.talk.model.TalkComment;
+import com.zippyziggy.monolithic.talk.model.TalkLike;
+import com.zippyziggy.monolithic.talk.repository.TalkCommentRepository;
+import com.zippyziggy.monolithic.talk.repository.TalkLikeRepository;
+import com.zippyziggy.monolithic.talk.repository.TalkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,7 +46,15 @@ public class MemberService {
 //    private final RedisService redisService;
     private final S3Service s3Service;
     private final SecurityUtil securityUtil;
-    private final KafkaProducer kafkaProducer;
+
+    private final PromptBookmarkRepository promptBookmarkRepository;
+    private final PromptLikeRepository promptLikeRepository;
+    private final PromptCommentRepository promptCommentRepository;
+    private final TalkRepository talkRepository;
+    private final TalkCommentRepository talkCommentRepository;
+    private final TalkLikeRepository talkLikeRepository;
+    private final PromptClickRepository promptClickRepository;
+
 
 
     /**
@@ -162,8 +179,59 @@ public class MemberService {
     public void memberSignOut() throws Exception {
 
         Member member = securityUtil.getCurrentMember();
+        UUID memberUuid = member.getUserUuid();
 
-        kafkaProducer.send("delete-member-topic", member.getUserUuid());
+        List<PromptLike> promptLikes = promptLikeRepository.findAllByMemberUuid(memberUuid);
+        List<PromptComment> promptComments = promptCommentRepository.findAllByMemberUuid(memberUuid);
+        List<PromptBookmark> promptBookmarks = promptBookmarkRepository.findAllByMemberUuid(memberUuid);
+        List<Talk> talkList = talkRepository.findAllByMemberUuid(memberUuid);
+        List<TalkComment> talkComments = talkCommentRepository.findAllByMemberUuid(memberUuid);
+        List<TalkLike> talkLikes = talkLikeRepository.findAllByMemberUuid(memberUuid);
+        List<PromptClick> promptClicks = promptClickRepository.findAllByMemberUuid(memberUuid);
+
+
+        if (promptLikes != null) {
+            promptLikes.stream().map(promptLike -> {promptLikeRepository.delete(promptLike);
+                return "프롬프트 좋아요 삭제 완료";
+            });
+        }
+
+        if (promptComments != null) {
+            promptComments.stream().map(promptComment -> {promptCommentRepository.delete(promptComment);
+                return "프롬프트 댓글 삭제 완료";
+            });
+        }
+
+        if (promptBookmarks != null) {
+            promptBookmarks.stream().map(promptBookmark -> {promptBookmarkRepository.delete(promptBookmark);
+                return "프롬프트 북마크 삭제 완료";
+            });
+        }
+
+        if (talkList != null) {
+            talkList.stream().map(talk -> {talkRepository.delete(talk);
+                return "톡 삭제 완료";
+            });
+        }
+
+        if (talkComments != null) {
+            talkComments.stream().map(talkComment -> {talkCommentRepository.delete(talkComment);
+                return "톡 댓글 삭제 완료";
+            });
+        }
+
+        if (talkLikes != null) {
+            talkLikes.stream().map(talkLike -> {talkLikeRepository.delete(talkLike);
+                return "톡 좋아요 삭제 완료";
+            });
+        }
+
+        if (promptClicks != null) {
+            promptClicks.stream().map(promptClick -> {
+                promptClickRepository.delete(promptClick);
+                return "최근 본 프롬프트 삭제 완료";
+            });
+        }
         memberRepository.delete(member);
 //        member.setActivate(false);
 //        member.setNickname("");

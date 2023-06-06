@@ -9,7 +9,6 @@ import com.zippyziggy.monolithic.talk.dto.response.PromptTalkListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,14 +33,6 @@ public class PromptController {
 	private final ForkPromptService forkPromptService;
 	private final PromptCommentService promptCommentService;
 
-	/**
-	 *
-	 * @param data
-	 * @param thumbnail
-	 *
-	 * @return
-	 */
-
 	@Operation(summary = "프롬프트 생성", description = "프롬프트를 생성한다.")
 	@PostMapping(value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	@ApiResponses({
@@ -54,13 +45,6 @@ public class PromptController {
 		return ResponseEntity.ok(promptService.createPrompt(data, thumbnail));
 	}
 
-	/**
-	 *
-	 * @param promptUuid
-	 * @param data
-	 * @param thumbnail
-	 * @return
-	 */
 	@Operation(summary = "프롬프트 수정", description = "본인이 작성한 프롬프트를 수정한다.")
 	@PutMapping(value = "/{promptUuid}",
 			consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -70,22 +54,11 @@ public class PromptController {
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	public ResponseEntity<PromptResponse> modifyPrompt(@PathVariable String promptUuid,
-													   @RequestPart PromptModifyRequest data,
+													   @RequestPart PromptRequest data,
 													   @RequestPart MultipartFile thumbnail) {
 		return ResponseEntity.ok(promptService.modifyPrompt(UUID.fromString(promptUuid), data, thumbnail));
 	}
 
-	/**
-	 *
-	 * 3순위, 나중에 수정 필요
-	 * 임시저장, 임시저장 삭제, 임시저장 후 최종 저장까지 구현해야 함
-	 */
-//	@ApiOperation(value = "프롬프트 임시 저장", notes = "프롬프트를 생성 시 임시 저장한다.")
-//	@PostMapping(value = "/temp", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//	public ResponseEntity<PromptResponse> createPromptTemp(@RequestPart PromptRequest data, @RequestPart MultipartFile thumbnail) {
-//		PromptResponse prompt = promptService.createPrompt(data, thumbnail);
-//		return ResponseEntity.ok(prompt);
-//	}
 	@Operation(summary = "프롬프트 상세 조회", description = "프롬프트 상세 페이지를 조회한다.")
 	@GetMapping("/{promptUuid}")
 	@ApiResponses({
@@ -304,15 +277,18 @@ public class PromptController {
 
 	}
 
-	@Operation(summary = "ChatGPT API", description = "프롬프트 생성 시 이용하는 ChatGPT API")
-	@PostMapping(value = "/gpt", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Chat GPT APP API", description = "APP에서 프롬프트 바로 이용해보기할 시 사용합니다.")
+	@PostMapping(value = "/gpt/app")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "성공"),
 			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	public ResponseEntity<GptApiResponse> testGptApi(@RequestBody GptApiRequest data) {
-		return ResponseEntity.ok(promptService.testGptApi(data));
+
+	public ResponseEntity<GptApiResponse> appChatGpt(@RequestBody AppChatGptRequest data) {
+		return ResponseEntity.ok(promptService.getChatGptAnswer(data));
 	}
+
+
 
 }

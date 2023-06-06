@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.11'
+    id 'org.springframework.boot' version '2.7.10'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
     //querydsl 추가
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
@@ -27,17 +27,21 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     // mysql
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
     runtimeOnly 'com.mysql:mysql-connector-j'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
     // Swagger
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
@@ -45,7 +49,7 @@ dependencies {
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.2.1'
 
     // S3
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -54,17 +58,15 @@ dependencies {
     implementation group: 'com.theokanning.openai-gpt3-java', name: 'client', version: '0.9.0'
     implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.4'
 
-    //webclient
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'com.sun.jersey.contribs:jersey-apache-client4:1.19.4'
 
 }
 

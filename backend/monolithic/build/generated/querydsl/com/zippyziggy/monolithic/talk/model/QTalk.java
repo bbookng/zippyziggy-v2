@@ -32,6 +32,8 @@ public class QTalk extends EntityPathBase<Talk> {
 
     public final ListPath<Message, QMessage> messages = this.<Message, QMessage>createList("messages", Message.class, QMessage.class, PathInits.DIRECT2);
 
+    public final StringPath model = createString("model");
+
     public final com.zippyziggy.monolithic.prompt.model.QPrompt prompt;
 
     public final DateTimePath<java.time.LocalDateTime> regDt = createDateTime("regDt", java.time.LocalDateTime.class);

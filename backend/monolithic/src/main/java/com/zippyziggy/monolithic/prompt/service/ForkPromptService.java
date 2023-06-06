@@ -1,7 +1,6 @@
 package com.zippyziggy.monolithic.prompt.service;
 
 import com.zippyziggy.monolithic.common.aws.AwsS3Uploader;
-import com.zippyziggy.monolithic.common.kafka.KafkaProducer;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.response.MemberResponse;
 import com.zippyziggy.monolithic.member.model.Member;
@@ -41,7 +40,6 @@ public class ForkPromptService {
 	private final PromptBookmarkRepository promptBookmarkRepository;
 	private final PromptLikeRepository promptLikeRepository;
 	private final TalkRepository talkRepository;
-	private final KafkaProducer kafkaProducer;
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
 
@@ -53,8 +51,6 @@ public class ForkPromptService {
 		prompt.setOriginPromptUuid(promptUuid);
 
 		promptRepository.save(prompt);
-
-		kafkaProducer.send("create-prompt-topic", prompt.toEsPromptRequest());
 
 		return ForkPromptResponse.from(prompt);
 	}
@@ -76,7 +72,9 @@ public class ForkPromptService {
 
 		List<PromptCardResponse> promptDtoList = forkedPrompts.stream().map(prompt -> {
 
-			UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+			Member currentMember = securityUtil.getCurrentMember();
+			UUID crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid() : null;
+
 			MemberResponse writerInfo = getMemberInfo(prompt.getMemberUuid());
 
 			// 댓글, 포크 프롬프트의 포크 수, 대화 수 가져오기
@@ -89,7 +87,7 @@ public class ForkPromptService {
 			boolean isBookmarked;
 
 			// 현재 로그인된 사용자가 아니면 기본값 false
-			if (crntMemberUuid.toString().equals("defaultValue")) {
+			if (crntMemberUuid == null) {
 				isBookmarked = false;
 				isLiked = false;
 			} else {
@@ -114,7 +112,9 @@ public class ForkPromptService {
 		Member member = memberRepository.findByUserUuid(memberUuid);
 		log.info("member = " + member);
 
-		MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
+		MemberResponse memberResponse = (null == member)
+				? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
+				: MemberResponse.from(member);
 
 		return memberResponse;
 	}

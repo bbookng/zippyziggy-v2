@@ -103,7 +103,9 @@ public class PromptCommentService {
 		Member member = memberRepository.findByUserUuid(memberUuid);
 		log.info("member = " + member);
 
-		MemberResponse memberResponse = (null == member) ? new MemberResponse() : MemberResponse.from(member);
+		MemberResponse memberResponse = (null == member)
+				? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
+				: MemberResponse.from(member);
 
 		return memberResponse;
 	}
