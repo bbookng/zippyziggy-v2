@@ -2,7 +2,6 @@ package com.zippyziggy.monolithic.member.controller;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.zippyziggy.monolithic.common.util.CookieUtils;
-
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.request.MemberSignUpRequestDto;
 import com.zippyziggy.monolithic.member.dto.response.*;
@@ -13,7 +12,6 @@ import com.zippyziggy.monolithic.member.repository.MemberRepository;
 import com.zippyziggy.monolithic.member.repository.VisitedMemberCountRepository;
 import com.zippyziggy.monolithic.member.service.*;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardListResponse;
-
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardResponse;
 import com.zippyziggy.monolithic.prompt.service.PromptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +53,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtValidationService jwtValidationService;
     private final PromptService promptService;
-    private final VisitedMemberCountService visitedMemberCountService;
+//    private final VisitedMemberCountService visitedMemberCountService;
     private final VisitedMemberCountRepository visitedMemberCountRepository;
 
     private final SecurityUtil securityUtil;

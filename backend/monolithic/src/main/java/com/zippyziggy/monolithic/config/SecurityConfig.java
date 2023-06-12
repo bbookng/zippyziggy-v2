@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/prompts/{promptUuid}/**").authenticated()
                 .antMatchers("/talks").authenticated()
                 .antMatchers("/talks/{talkId}/**").authenticated()
+                .antMatchers("/swagger-ui/**", "/v3/api-docs/").permitAll()
 //                .antMatchers("/members/test/userUtil").hasRole("ADMIN") // ADMIN 권한이 있을 때에만 접근 가능
                 .anyRequest().permitAll()
                 .and()
