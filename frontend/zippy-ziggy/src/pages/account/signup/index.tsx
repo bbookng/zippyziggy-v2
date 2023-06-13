@@ -129,6 +129,17 @@ export default function SignUp() {
   // 회원가입 버튼 클릭
   const handleSignupBtnClick = async (event) => {
     event.preventDefault();
+    if (/^[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z|0-9]*$/.test(nickname) === false) {
+      Toastify({
+        text: message.ValidationFailNickname,
+        duration: 1000,
+        position: 'center',
+        stopOnFocus: true,
+        style: toastifyCSS.error,
+      }).showToast();
+      return;
+    }
+
     const resultNickname = await getNicknameAPI(nickname);
     if (resultNickname.result === 'FAIL') {
       setStatusNickname('error');
@@ -218,7 +229,6 @@ export default function SignUp() {
               accept="image/*"
               onChange={registerImage}
               ref={inputRef}
-              maxLength={10}
               style={{ display: 'none' }}
             />
           </label>
@@ -229,6 +239,7 @@ export default function SignUp() {
             id="nickname"
             placeholder="닉네임을 입력해주세요"
             value={nickname}
+            maxLength={10}
             onChange={(e) => setBeforeNickname(e.target.value)}
             required
           />

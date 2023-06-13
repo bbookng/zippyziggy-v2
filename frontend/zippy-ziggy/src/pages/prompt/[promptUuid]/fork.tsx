@@ -1,6 +1,14 @@
+import {
+  sequenceForkText,
+  sequenceText,
+  useGuide,
+  useTestAPI,
+} from '@/components/CreatePrompt/CreateCommon';
 import CreateFooter from '@/components/CreatePrompt/CreateFooter';
 import CreatePart1 from '@/components/CreatePrompt/CreatePrompt_1';
 import CreatePart2 from '@/components/CreatePrompt/CreatePrompt_2';
+import GuideBalloon from '@/components/CreatePrompt/GuideBallon';
+import { Overlay } from '@/components/Navbar/NavbarStyle';
 import { createPromptFork, getPromptDetail, testPrompt } from '@/core/prompt/promptAPI';
 import { useAppSelector } from '@/hooks/reduxHook';
 import { checkInputFormToast } from '@/lib/utils';
@@ -9,7 +17,7 @@ import imgComp from '@/utils/imgComp';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AiFillQuestionCircle } from 'react-icons/ai';
 import styled from 'styled-components';
@@ -26,13 +34,19 @@ export default function PromptUpdate() {
   const router = useRouter();
   const { promptUuid } = router.query;
   const [testContent, setTestContent] = useState<string | null>('위의 테스트 버튼을 눌러주세요!');
-  const [GPTIsLoading, setGPTIsLoading] = useState<boolean>(false);
-  const textList = [
-    'GPT에게 요청중입니다',
-    '잠시만 기다려주세요',
-    '최대 1분 이상 소요될 수 있습니다',
-  ];
-  const [text, setText] = useState<string>(textList[0]);
+
+  const { isTestLoading, loadingText, startLoadingText, endLoadingText } = useTestAPI();
+
+  const {
+    guideSequence,
+    isShowGuide,
+    setIsShowGuide,
+    guideElementRef,
+    nextGuide,
+    preGuide,
+    skipGuide,
+  } = useGuide();
+
   const fork = true;
 
   const initialState = {
@@ -44,6 +58,8 @@ export default function PromptUpdate() {
     image: null,
     category: '',
   };
+
+  const refArray = [useRef(null), useRef(null), useRef(null)];
 
   // react-hook-form 설정
   const { setValue, getValues, watch } = useForm({
@@ -89,12 +105,25 @@ export default function PromptUpdate() {
     enabled: !!promptUuid,
   });
 
+  // textarea 높이 변경
+  const handleRefChange = () => {
+    refArray[0].current.style.height = 'auto';
+    refArray[0].current.style.height = `${refArray[0].current.scrollHeight}px`;
+    refArray[1].current.style.height = 'auto';
+    refArray[1].current.style.height = `${refArray[1].current.scrollHeight}px`;
+    refArray[2].current.style.height = 'auto';
+    refArray[2].current.style.height = `${refArray[2].current.scrollHeight}px`;
+  };
+
   useEffect(() => {
     watch();
     if (!isLoading) {
       setValue('prompt1', data?.data?.messageResponse?.prefix || '');
       setValue('prompt2', data?.data?.messageResponse?.suffix || '');
       setValue('example', data?.data?.messageResponse?.example || '');
+      refArray[0].current.value = data?.data?.messageResponse?.prefix || '';
+      refArray[1].current.value = data?.data?.messageResponse?.suffix || '';
+      refArray[2].current.value = data?.data?.messageResponse?.example || '';
       setValue('title', data?.data?.title);
       setValue('content', data?.data?.description);
       setValue('category', data?.data?.category);
@@ -102,24 +131,20 @@ export default function PromptUpdate() {
         setPreview(data?.data?.thumbnail);
         getFile(data?.data?.thumbnail);
       }
+      handleRefChange();
     }
   }, [isLoading]);
 
   // 프롬프트 테스트 요청
   const handleTest = async () => {
-    setGPTIsLoading(true);
-    let i = 1;
-    const loadingText = setInterval(() => {
-      setText(textList[i % textList.length]);
-      i++;
-    }, 2000);
+    startLoadingText();
     const requestData = {
       prefix: prompt1,
       example,
       suffix: prompt2,
     };
     const test = await testPrompt(requestData);
-    setGPTIsLoading(false);
+    endLoadingText();
     clearInterval(loadingText);
     if (test.result === 'SUCCESS') {
       setTestContent(test.data.apiResult.trim());
@@ -200,7 +225,17 @@ export default function PromptUpdate() {
         <TitleWrapper isNext={isNext}>
           <div className="title">프롬프트 포크</div>
           <div className="help">
-            <div>포크로 쉽게 변경해서 쓰세요</div>
+            <AiFillQuestionCircle className="icon" />
+
+            <div
+              ref={guideElementRef[0]}
+              onClick={() => {
+                setIsNext(false);
+                setIsShowGuide(true);
+              }}
+            >
+              포크가 처음이신가요?
+            </div>
           </div>
         </TitleWrapper>
         {/* prompt.forkCnt > 0 으로 확인하도록 바꾸기!! */}
@@ -229,13 +264,15 @@ export default function PromptUpdate() {
         />
       ) : (
         <CreatePart1
+          guideElementRef={guideElementRef}
           prompt1={prompt1}
           prompt2={prompt2}
           example={example}
+          refArray={refArray}
           possible
-          text={text}
+          text={loadingText}
           testContent={testContent}
-          isLoading={GPTIsLoading}
+          isLoading={isTestLoading}
           handleTest={handleTest}
           handleChange={handleChange}
         />
@@ -247,6 +284,17 @@ export default function PromptUpdate() {
         handleNext={handleNext}
         handlePrompt={handleCreatePromptFork}
       />
+
+      <GuideBalloon
+        isShow={isShowGuide}
+        sequenceText={sequenceForkText}
+        handleNextBtn={nextGuide}
+        handlePrevBtn={preGuide}
+        handleSkipBtn={skipGuide}
+        sequence={guideSequence}
+        targetElementRef={guideElementRef[guideSequence]}
+      />
+      {isShowGuide && <Overlay onClick={() => skipGuide()} />}
     </>
   );
 }

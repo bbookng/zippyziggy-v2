@@ -24,6 +24,7 @@ import Footer from '@/components/Footer/Footer';
 import Paragraph from '@/components/Typography/Paragraph';
 import { links } from '@/utils/links';
 import ProfileRecommendPromptList from '@/components/DetailPrompt/ProfileRecommendPromptList';
+import { setIsZippy } from '@/core/zippy/zippySlice';
 
 const ProfileContainer = styled.div`
   width: 100%;
@@ -81,7 +82,18 @@ export default function Index() {
   const [totalPromptsCnt, setTotalPromptsCnt] = useState<number>(0);
   const page = useRef<number>(0);
   const [isMyPage, setIsMyPage] = useState<boolean>(false);
-  const [isDownload, setIsDownload] = useState<boolean>(false);
+
+  const zippyState = useAppSelector((state) => state.zippy); // 다운로드 정보
+
+  useEffect(() => {
+    const zippy = document.documentElement.getAttribute('zippy');
+    if (zippy === 'true') {
+      dispatch(setIsZippy(true));
+    } else {
+      dispatch(setIsZippy(false));
+    }
+  }, []);
+
   // 1단계 : 유저 정보 받아오기
   const handleUserAPI = async () => {
     const result = await getUserAPI(userUuid);
@@ -92,7 +104,7 @@ export default function Index() {
     //    2. 유저정보가 있지만, null로 들어오는 경우 (삭제된 유저)
     if (
       (mypage === 'true' && result?.result === 'FAIL') ||
-      (result?.result === 'SUCCESS' && (result?.nickname === null || result?.profileImg === null))
+      (result?.result === 'SUCCESS' && result?.userUuid === '')
     ) {
       localStorage.clear();
       dispatch(setUserReset());
@@ -109,7 +121,7 @@ export default function Index() {
     // 유저정보가 있을 경우
     if (result?.result === 'SUCCESS') {
       // 데이터가 null로 오는 경우 profile 404 페이지로 이동
-      if (result?.nickname === null || result?.profileImg === null) {
+      if (result?.userUuid === '') {
         router.replace('/profile');
         return false;
       }
@@ -130,7 +142,7 @@ export default function Index() {
     };
     const data = await getTalksProfileAPI(requestData);
     if (data.result === 'SUCCESS') {
-      setCardList(data.data.searchTalkList);
+      setCardList(data.data.memberTalkList);
       setTotalPromptsCnt(data.data.totalTalksCnt);
     }
     return true;
@@ -140,7 +152,7 @@ export default function Index() {
   const handleProfileData = async () => {
     // 유저가 없을 시 더이상 데이터를 받아오지 않음
     const result = await handleUserAPI();
-    if (result) {
+    if (!result) {
       return;
     }
     await handleTalksProfile();
@@ -182,14 +194,6 @@ export default function Index() {
     handleTalksProfile();
   };
 
-  useEffect(() => {
-    const zippy = document.documentElement.getAttribute('zippy');
-    if (zippy === 'true') {
-      setIsDownload(true);
-    } else {
-      setIsDownload(false);
-    }
-  }, []);
   return (
     <ProfileContainer>
       <ProfileHeaderContainer>
@@ -238,7 +242,7 @@ export default function Index() {
             >
               <FiLink2 className="icon" size="20" style={{ marginLeft: '8px' }} />
               <span className="flex1" style={{ marginLeft: '8px' }}>
-                {isDownload ? 'GPT 확장이 설치됨' : 'GPT 확장 설치하기'}
+                {zippyState.isZippy ? 'GPT 확장이 설치됨' : 'GPT 확장 설치하기'}
               </span>
             </IconButton>
           </div>
