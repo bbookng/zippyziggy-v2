@@ -23,14 +23,14 @@ export default function LoginModal({ title, content, handleModalClose }: PropsTy
   const HandleKokaoLogin = () => {
     const redirectUri = `${window.location.origin}/account/oauth/kakao`;
     Router.push(
-      `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code`
+      `https://kauth.kakao.com/oauth/authorize?client_id=caeb5575d99036003c187adfadea9863&redirect_uri=${redirectUri}&response_type=code`
     );
   };
 
   const HandlegoogleLogin = () => {
     const redirectUri = `${window.location.origin}/account/oauth/google`;
     Router.push(
-      `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile`
+      `https://accounts.google.com/o/oauth2/v2/auth?client_id=972594831157-fdfm8rq46vrb3tl81ds49o5978hs2ld0.apps.googleusercontent.com&redirect_uri=${redirectUri}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile`
     );
   };
 
