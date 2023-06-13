@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/members")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
 @Slf4j
 @Transactional

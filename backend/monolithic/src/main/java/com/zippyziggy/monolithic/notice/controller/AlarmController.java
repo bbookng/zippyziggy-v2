@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notice")
+@RequestMapping("/api/notice")
 @RequiredArgsConstructor
 @Slf4j
 public class AlarmController {

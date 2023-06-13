@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/prompts")
+@RequestMapping("/api/prompts")
 @RequiredArgsConstructor
 public class PromptController {
 
