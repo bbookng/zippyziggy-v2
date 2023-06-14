@@ -376,13 +376,14 @@ public class PromptService{
     북마크 조회하기
      */
 	public PromptCardListResponse bookmarkPromptByMember(Pageable pageable) {
+		System.out.println(securityUtil.getCurrentMember());
 		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		log.info("crntMemberUuid -> ", crntMemberUuid);;
 
 		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		log.info("prompts -> ", prompts);
-		final long totalPromptsCnt = prompts.getTotalElements();
-		final int totalPageCnt = prompts.getTotalPages();
+		long totalPromptsCnt = prompts.getTotalElements();
+		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
 
 		for (Prompt prompt : prompts) {
@@ -468,12 +469,12 @@ public class PromptService{
 		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 		final Prompt prompt = promptRepository
-			.findByPromptUuid(promptUuid)
-			.orElseThrow(PromptNotFoundException::new);
+				.findByPromptUuid(promptUuid)
+				.orElseThrow(PromptNotFoundException::new);
 
 		long talkCnt = talkRepository.countAllByPromptPromptUuid(promptUuid);
 		long commentCnt = promptCommentRepository
-			.countAllByPromptPromptUuid(promptUuid);
+				.countAllByPromptPromptUuid(promptUuid);
 
 		boolean isLiked;
 		boolean isBookmarked;
@@ -483,9 +484,9 @@ public class PromptService{
 		} else {
 			UUID memberUuid = UUID.fromString(crntMemberUuid);
 			isLiked = promptLikeRepository
-				.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
+					.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
 			isBookmarked = promptBookmarkRepository
-				.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
+					.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
 		}
 
 		return SearchPromptResponse.from(prompt, talkCnt, commentCnt, isLiked, isBookmarked);
