@@ -14,6 +14,7 @@ import com.zippyziggy.monolithic.member.service.*;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardListResponse;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardResponse;
 import com.zippyziggy.monolithic.prompt.service.PromptService;
+import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -192,7 +193,7 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     public ResponseEntity<?> loginCheckByAccessToken() {
-        Member member = securityUtil.getCurrentMember();
+        Member member = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
         if (member == null) {
             return ResponseEntity.ok("로그인되지 않은 유저이거나 유효하지 않은 토큰 요청입니다.");
         } else {
@@ -599,7 +600,7 @@ public class MemberController {
     public ResponseEntity<?> logout(@RequestParam(value = "redirect", required = false) String redirectUrl ,HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // 기존 유저 찾아온 후 refreshToken 제거
-        Member member = securityUtil.getCurrentMember();
+        Member member = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
         member.setRefreshToken(null);
 
         // 기존에 있던 redis 정보 삭제
@@ -895,7 +896,7 @@ public class MemberController {
     public ResponseEntity<?> updateProfile(@RequestPart(value = "file", required = false) MultipartFile file,
                                            @RequestPart("nickname") String nickname) throws Exception {
         // 기존 유저 찾아오기
-        Member member = securityUtil.getCurrentMember();
+        Member member = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
 
         // 회원 정보 수정
         Member updateMember = memberService.updateProfile(nickname, file, member);

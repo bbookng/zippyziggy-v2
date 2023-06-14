@@ -15,6 +15,7 @@ import com.zippyziggy.monolithic.prompt.repository.PromptBookmarkRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptClickRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptCommentRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptLikeRepository;
+import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import com.zippyziggy.monolithic.talk.model.Talk;
 import com.zippyziggy.monolithic.talk.model.TalkComment;
 import com.zippyziggy.monolithic.talk.model.TalkLike;
@@ -178,7 +179,7 @@ public class MemberService {
      */
     public void memberSignOut() throws Exception {
 
-        Member member = securityUtil.getCurrentMember();
+        Member member = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
         UUID memberUuid = member.getUserUuid();
 
         List<PromptLike> promptLikes = promptLikeRepository.findAllByMemberUuid(memberUuid);

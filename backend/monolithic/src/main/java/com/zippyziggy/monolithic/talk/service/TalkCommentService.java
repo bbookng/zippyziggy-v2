@@ -8,6 +8,7 @@ import com.zippyziggy.monolithic.prompt.exception.ForbiddenMemberException;
 import com.zippyziggy.monolithic.talk.dto.request.TalkCommentRequest;
 import com.zippyziggy.monolithic.talk.dto.response.TalkCommentListResponse;
 import com.zippyziggy.monolithic.talk.dto.response.TalkCommentResponse;
+import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import com.zippyziggy.monolithic.talk.exception.TalkCommentNotFoundException;
 import com.zippyziggy.monolithic.talk.exception.TalkNotFoundException;
 import com.zippyziggy.monolithic.talk.model.Talk;
@@ -50,7 +51,7 @@ public class TalkCommentService {
 	}
 
 	public TalkCommentResponse createTalkComment(Long talkId, TalkCommentRequest data) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
 		Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
 
 		TalkComment talkComment = TalkComment.from(data, crntMemberUuid, talk);
@@ -65,7 +66,7 @@ public class TalkCommentService {
 	본인 댓글인지 확인하고 수정
 	 */
 	public TalkCommentResponse modifyTalkComment(Long commentId, TalkCommentRequest data) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
 		TalkComment comment = talkCommentRepository.findById(commentId)
 			.orElseThrow(TalkCommentNotFoundException::new);
 
@@ -83,7 +84,7 @@ public class TalkCommentService {
 	본인 댓글인지 확인하고 삭제
 	 */
 	public void removeTalkComment(Long commentId) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
 		TalkComment comment = talkCommentRepository.findById(commentId)
 			.orElseThrow(TalkCommentNotFoundException::new);
 
