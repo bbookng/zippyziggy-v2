@@ -289,6 +289,23 @@ public class PromptController {
 		return ResponseEntity.ok(promptService.getChatGptAnswer(data));
 	}
 
-
+	@Operation(summary = "프롬프트 목록 조회 및 검색", description = "프롬프트 전체 목록을 조회하거나 검색한다.")
+	@GetMapping
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "성공"),
+			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
+			@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	public ResponseEntity<SearchPromptList> getPromptList(
+			@RequestHeader(required = false) String crntMemberUuid,
+			@RequestParam(required = false, defaultValue = "") String keyword,
+			@RequestParam(required = false, defaultValue = "ALL") String category,
+			@RequestParam(required = false, defaultValue = "0") int page,
+			@RequestParam(required = false, defaultValue = "10") int size,
+			@RequestParam(required = false, defaultValue = "likeCnt") String sort
+	) {
+		SearchPromptList promptList = promptService.searchPrompts(crntMemberUuid, keyword, category, page, size, sort);
+		return ResponseEntity.ok(promptList);
+	}
 
 }

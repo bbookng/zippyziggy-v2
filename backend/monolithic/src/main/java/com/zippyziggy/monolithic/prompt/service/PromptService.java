@@ -3,6 +3,7 @@ package com.zippyziggy.monolithic.prompt.service;
 import com.zippyziggy.monolithic.common.aws.AwsS3Uploader;
 import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.member.dto.response.MemberResponse;
+import com.zippyziggy.monolithic.member.dto.response.WriterResponse;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.repository.MemberRepository;
 import com.zippyziggy.monolithic.notice.service.AlarmService;
@@ -20,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -466,12 +469,12 @@ public class PromptService{
 		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 		final Prompt prompt = promptRepository
-			.findByPromptUuid(promptUuid)
-			.orElseThrow(PromptNotFoundException::new);
+				.findByPromptUuid(promptUuid)
+				.orElseThrow(PromptNotFoundException::new);
 
 		long talkCnt = talkRepository.countAllByPromptPromptUuid(promptUuid);
 		long commentCnt = promptCommentRepository
-			.countAllByPromptPromptUuid(promptUuid);
+				.countAllByPromptPromptUuid(promptUuid);
 
 		boolean isLiked;
 		boolean isBookmarked;
@@ -481,9 +484,9 @@ public class PromptService{
 		} else {
 			UUID memberUuid = UUID.fromString(crntMemberUuid);
 			isLiked = promptLikeRepository
-				.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
+					.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
 			isBookmarked = promptBookmarkRepository
-				.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
+					.existsByMemberUuidAndPrompt_PromptUuid(memberUuid, promptUuid);
 		}
 
 		return SearchPromptResponse.from(prompt, talkCnt, commentCnt, isLiked, isBookmarked);
@@ -626,5 +629,63 @@ public class PromptService{
 				: MemberResponse.from(member);
 
 		return memberResponse;
+	}
+
+    public SearchPromptList searchPrompts(String crntMemberUuid, String keyword, String category, int page, int size, String sort) {
+		final Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
+		final Pageable pageable = PageRequest.of(page, size, sortBy);
+
+		final Page<Prompt> pagedPrompt = search(keyword, category, pageable);
+		final long totalPromptsCnt = pagedPrompt.getTotalElements();
+		final int totalPageCnt = pagedPrompt.getTotalPages();
+
+		final List<SearchPrompt> searchPrompts = new ArrayList<>();
+		for (Prompt prompt : pagedPrompt) {
+			// prompt 관련 필요한 정보 조회
+			final UUID promptUuid = prompt.getPromptUuid();
+			final SearchPromptResponse fromPrompt = searchPrompt(promptUuid);
+
+			// 사용자 조회
+			final MemberResponse member = getMemberInfo(prompt.getMemberUuid());
+			final WriterResponse writer = member.toWriterResponse();
+
+			// dto로 변환하기
+			searchPrompts.add(SearchPrompt.of(
+					prompt,
+					fromPrompt,
+					writer
+			));
+
+		}
+		return SearchPromptList.of(totalPromptsCnt, totalPageCnt, searchPrompts);
+	}
+
+	private Page<Prompt> search(
+			String keyword,
+			String category,
+			Pageable pageable
+	) {
+		Page<Prompt> pagedEsPrompt = null;
+		keyword = (keyword.equals("")) ? null : keyword;
+		category = (category.equals("ALL")) ? null : category;
+
+		if (null != keyword & null != category) {
+			pagedEsPrompt = promptRepository
+					.findByKeywordAndCategory(keyword, category, pageable);
+
+		} else if (null == keyword & null != category) {
+			pagedEsPrompt = promptRepository
+					.findByCategory(category, pageable);
+
+		} else if (null != keyword & null == category) {
+			pagedEsPrompt = promptRepository
+					.findByKeywordOnly(keyword, pageable);
+
+		} else if (null == keyword & null == category) {
+			pagedEsPrompt = promptRepository
+					.findAll(pageable);
+		}
+
+		return pagedEsPrompt;
 	}
 }
