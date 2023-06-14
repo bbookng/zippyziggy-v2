@@ -363,7 +363,7 @@ public class PromptService{
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
 				.orElseThrow(PromptNotFoundException::new);
-		PromptBookmark promptBookmark = promptBookmarkRepository.findByMemberUuidAndPrompt(crntMemberUuid, prompt).orElseThrow(PromptNotFoundException::new);
+		PromptBookmark promptBookmark = promptBookmarkRepository.findByMemberUuidAndPrompt(crntMemberUuid, prompt).orElse(null);
 		if (promptBookmark == null) {
 			promptBookmarkRepository.save(PromptBookmark.from(prompt, crntMemberUuid));
 		} else {
