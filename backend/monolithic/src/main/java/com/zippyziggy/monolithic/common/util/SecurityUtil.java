@@ -41,7 +41,14 @@ public class SecurityUtil {
             userUuid = (String) authentication.getPrincipal();
         }
 
-        UUID uuid = UUID.fromString(userUuid);
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(userUuid);
+        } catch (IllegalArgumentException e) {
+            logger.debug("유효하지 않은 UUID 문자열입니다.");
+            return Optional.empty();
+        }
+
 
         return Optional.ofNullable(memberRepository.findByUserUuid(uuid));
     }
