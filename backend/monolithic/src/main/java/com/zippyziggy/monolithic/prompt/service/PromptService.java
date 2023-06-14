@@ -330,6 +330,7 @@ public class PromptService{
 	public PromptCardListResponse likePromptsByMember (String userUuid, Pageable pageable) {
 
 		UUID crntMemberUuid = UUID.fromString(userUuid);
+
 		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		final long totalPromptsCnt = prompts.getTotalElements();
 		final int totalPageCnt = prompts.getTotalPages();
@@ -379,7 +380,7 @@ public class PromptService{
 
 		UUID crntMemberUuid = UUID.fromString(memberUuid);
 
-		Page<Prompt> prompts = promptRepository.findAllByStatusCodeAndPromptBookmarksMemberUuid(StatusCode.OPEN, crntMemberUuid, pageable);
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
