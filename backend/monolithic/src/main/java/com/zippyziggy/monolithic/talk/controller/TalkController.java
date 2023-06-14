@@ -153,14 +153,4 @@ public class TalkController {
 		return ResponseEntity.ok(talkService.findCommentCnt(talkId));
 	}
 
-	@Operation(hidden = true)
-	@GetMapping("/members/profile/{crntMemberUuid}")
-	public ResponseEntity<MemberTalkList> memberPrompts(
-			@PathVariable String crntMemberUuid,
-			@RequestParam(required = false, defaultValue = "0") int page,
-			@RequestParam(required = false, defaultValue = "10") int size,
-			@RequestParam(required = false, defaultValue = "likeCnt") String sort
-	) {
-		return ResponseEntity.ok(talkService.findTalksByMemberUuid(crntMemberUuid, page, size, sort));
-	}
 }

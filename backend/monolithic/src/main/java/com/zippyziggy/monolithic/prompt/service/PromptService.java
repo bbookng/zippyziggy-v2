@@ -327,8 +327,9 @@ public class PromptService{
     /*
     로그인한 유저가 좋아요를 누른 프롬프트 조회하기, PromptCard 타입의 리스트 형식으로 응답
      */
-	public PromptCardListResponse likePromptsByMember (Pageable pageable) {
-		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
+	public PromptCardListResponse likePromptsByMember (String userUuid, Pageable pageable) {
+
+		UUID crntMemberUuid = UUID.fromString(userUuid);
 
 		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		final long totalPromptsCnt = prompts.getTotalElements();
@@ -375,13 +376,11 @@ public class PromptService{
 	/*
     북마크 조회하기
      */
-	public PromptCardListResponse bookmarkPromptByMember(Pageable pageable) {
-		System.out.println(securityUtil.getCurrentMember());
-		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
-		log.info("crntMemberUuid -> ", crntMemberUuid);;
+	public PromptCardListResponse bookmarkPromptByMember(String memberUuid, Pageable pageable) {
+
+		UUID crntMemberUuid = UUID.fromString(memberUuid);
 
 		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
-		log.info("prompts -> ", prompts);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();

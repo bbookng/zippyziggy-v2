@@ -14,6 +14,8 @@ import com.zippyziggy.monolithic.member.service.*;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardListResponse;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardResponse;
 import com.zippyziggy.monolithic.prompt.service.PromptService;
+import com.zippyziggy.monolithic.talk.dto.response.MemberTalkList;
+import com.zippyziggy.monolithic.talk.service.TalkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -53,6 +55,7 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtValidationService jwtValidationService;
     private final PromptService promptService;
+    private final TalkService talkService;
 //    private final VisitedMemberCountService visitedMemberCountService;
     private final VisitedMemberCountRepository visitedMemberCountRepository;
 
@@ -234,7 +237,7 @@ public class MemberController {
                                                                   @RequestParam("page") Integer page,
                                                                   @RequestParam("size") Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        PromptCardListResponse promptsLike = promptService.likePromptsByMember(pageRequest);
+        PromptCardListResponse promptsLike = promptService.likePromptsByMember(crntMemberUuid, pageRequest);
         return ResponseEntity.ok(promptsLike);
 
     }
@@ -258,8 +261,19 @@ public class MemberController {
     ) {
         final Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
         final Pageable pageable = PageRequest.of(page, size, sortBy);
-        PromptCardListResponse promptsBookmark = promptService.bookmarkPromptByMember(pageable);
+        PromptCardListResponse promptsBookmark = promptService.bookmarkPromptByMember(crntMemberUuid, pageable);
         return ResponseEntity.ok(promptsBookmark);
+    }
+
+    @Operation(summary = "멤버의 대화 조회", description = "멤버가 생성한 대화를 조회한다.")
+    @GetMapping("/talks/profile/{crntMemberUuid}")
+    public ResponseEntity<MemberTalkList> memberPrompts(
+            @PathVariable String crntMemberUuid,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "likeCnt") String sort
+    ) {
+        return ResponseEntity.ok(talkService.findTalksByMemberUuid(crntMemberUuid, page, size, sort));
     }
 
 
