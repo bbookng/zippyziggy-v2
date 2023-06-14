@@ -1,5 +1,6 @@
 package com.zippyziggy.monolithic.notice.service;
 
+import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.notice.entity.Alarm;
 import com.zippyziggy.monolithic.notice.entity.AlarmEntity;
 import com.zippyziggy.monolithic.notice.repository.AlarmEntityRepository;
@@ -26,9 +27,11 @@ public class AlarmService {
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 10; // 10분으로 설정
     private final AlarmRepository alarmRepository;
     private final AlarmEntityRepository alarmEntityRepository;
+    private final SecurityUtil securityUtil;
 
     @Transactional
-    public SseEmitter subscribe(String memberUuid, String lastEventId) {
+    public SseEmitter subscribe(String lastEventId) {
+        String memberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
 
         String emitterId = makeTimeIncludeId(memberUuid);
 

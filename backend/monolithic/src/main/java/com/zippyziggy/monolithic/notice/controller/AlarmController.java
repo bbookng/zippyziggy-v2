@@ -37,7 +37,7 @@ public class AlarmController {
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	public ResponseEntity<SseEmitter> subscribe(@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
-												HttpServletResponse response, @RequestHeader String crntMemberUuid) {
+												HttpServletResponse response) {
 
 		// HTTP1.1에서는 keep-alive가 기본 속성이지만 HTTP1.0같은 경우는 명시해줘야해서 헤더에 기입
 		response.setHeader("Connection", "keep-alive");
@@ -50,7 +50,7 @@ public class AlarmController {
 		// 그래서 버퍼링을 하지 않도록 아래와 같이 헤더에 추가해준다.
 		response.setHeader("X-Accel-Buffering", "no");
 
-		return ResponseEntity.ok(alarmService.subscribe(crntMemberUuid, lastEventId));
+		return ResponseEntity.ok(alarmService.subscribe(lastEventId));
 
 	}
 
