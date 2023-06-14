@@ -377,8 +377,10 @@ public class PromptService{
      */
 	public PromptCardListResponse bookmarkPromptByMember(Pageable pageable) {
 		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+		log.info("crntMemberUuid -> ", crntMemberUuid);;
 
 		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
+		log.info("prompts -> ", prompts);
 		final long totalPromptsCnt = prompts.getTotalElements();
 		final int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
