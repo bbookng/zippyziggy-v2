@@ -15,7 +15,6 @@ import com.zippyziggy.monolithic.prompt.repository.PromptBookmarkRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptCommentRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptLikeRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptRepository;
-import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import com.zippyziggy.monolithic.talk.repository.TalkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,7 @@ public class ForkPromptService {
 
 		String thumbnailUrl = awsS3Uploader.upload(thumbnail, "thumbnails");
 
-		Prompt prompt = Prompt.from(data, securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid(), thumbnailUrl);
+		Prompt prompt = Prompt.from(data, securityUtil.getCurrentMember().getUserUuid(), thumbnailUrl);
 		prompt.setOriginPromptUuid(promptUuid);
 
 		promptRepository.save(prompt);
@@ -73,7 +72,7 @@ public class ForkPromptService {
 
 		List<PromptCardResponse> promptDtoList = forkedPrompts.stream().map(prompt -> {
 
-			Member currentMember = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
+			Member currentMember = securityUtil.getCurrentMember();
 			UUID crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid() : null;
 
 			MemberResponse writerInfo = getMemberInfo(prompt.getMemberUuid());

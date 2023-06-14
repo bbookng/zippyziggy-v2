@@ -1,16 +1,22 @@
+server:
+  port: 8000
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://jayl2.me:13306/zippyziggy?serverTimezone=Asia/Seoul&useSSL=false
-    username: root
-    password: jaylee15@
+    url: jdbc:mysql://zippyziggy.kr:3306/zippyziggy?serverTimezone=Asia/Seoul&useSSL=false
+    username: teamdeundeun
+    password: ssafyE205!
+    hikari:
+      max-lifetime: 178000
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+    show-sql: true
     hibernate:
-      ddl-auto: create
-  redis:
-    port: 6382
-    host: zippyziggy.kr
-    password: zippyziggy
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -20,17 +26,20 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+openai:
+  api-key: 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
+
 jwt:
   secret:
     key: zippyziggy1234567890zippyziggy1234567890zippyziggy1234567890e205
   access:
     token:
       expiration:
-        time: 10000000
+        time: 1209600000
   refresh:
     token:
       expiration:
-        time: 100000000
+        time: 1209600000
 
 kakao:
   client:
@@ -52,14 +61,14 @@ google:
 cloud:
   aws:
     credentials:
-      access-key: AKIAR2XZF4GZCW4QKL2Q
-      secret-key: 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
+      access-key: AKIAZRJEGXHNJV7MA6HL
+      secret-key: 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
     s3:
-      bucket: zippyziggy
+      bucket: zippyziggyimage
     region:
       static: ap-northeast-2
     stack:
       auto: false
 
 chatgpt:
-  api-key: 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
+  api-key: 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
