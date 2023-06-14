@@ -316,7 +316,7 @@ public class PromptService{
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
 				.orElseThrow(PromptNotFoundException::new);
-		PromptLike promptLike = promptLikeRepository.findByPromptAndMemberUuid(prompt, crntMemberUuid).orElseThrow(PromptNotFoundException::new);
+		PromptLike promptLike = promptLikeRepository.findByPromptAndMemberUuid(prompt, crntMemberUuid).orElse(null);
 		if (promptLike != null) {
 			return promptLike;
 		} else {
