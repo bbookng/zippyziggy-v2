@@ -55,6 +55,7 @@ public class KakaoLoginService {
                 .blockOptional().orElseThrow(
                         () -> new RuntimeException("응답 시간을 초과하였습니다.")
                 );
+        log.info(token);
         // 객체로 전환
         KakaoTokenResponseDto kakaoTokenResponseDto = objectMapper.readValue(token, KakaoTokenResponseDto.class);
         return kakaoTokenResponseDto.getAccess_token();
