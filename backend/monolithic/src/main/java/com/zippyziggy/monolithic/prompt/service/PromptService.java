@@ -64,6 +64,8 @@ public class PromptService{
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
 	private final AlarmService alarmService;
+	private final PromptBookmarkCustomRepository promptBookmarkCustomRepository;
+	private final PromptLikeCustomRepository promptLikeCustomRepository;
 
 
 	// Exception 처리 필요
@@ -380,7 +382,7 @@ public class PromptService{
 
 		UUID crntMemberUuid = UUID.fromString(memberUuid);
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
+		Page<Prompt> prompts = promptBookmarkCustomRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
@@ -408,7 +410,7 @@ public class PromptService{
 	public PromptCardListExtensionResponse bookmarkPromptByMemberAndExtension(String crntMemberUuid, Pageable pageable) {
 		log.info(String.valueOf(pageable.getSort()));
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+		Page<Prompt> prompts = promptBookmarkCustomRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 

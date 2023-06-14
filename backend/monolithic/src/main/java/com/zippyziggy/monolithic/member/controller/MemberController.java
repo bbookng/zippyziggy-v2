@@ -257,7 +257,7 @@ public class MemberController {
             @PathVariable String crntMemberUuid,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "likeCnt") String sort
+            @RequestParam(required = false, defaultValue = "regDt") String sort
     ) {
         final Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
         final Pageable pageable = PageRequest.of(page, size, sortBy);
