@@ -376,7 +376,7 @@ public class PromptService{
     북마크 조회하기
      */
 	public PromptCardListResponse bookmarkPromptByMember(Pageable pageable) {
-		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 
 		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		final long totalPromptsCnt = prompts.getTotalElements();
