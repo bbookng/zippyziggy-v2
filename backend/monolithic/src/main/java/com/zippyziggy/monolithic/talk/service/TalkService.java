@@ -16,7 +16,6 @@ import com.zippyziggy.monolithic.prompt.repository.PromptLikeRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptRepository;
 import com.zippyziggy.monolithic.talk.dto.request.TalkRequest;
 import com.zippyziggy.monolithic.talk.dto.response.*;
-import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import com.zippyziggy.monolithic.talk.exception.TalkNotFoundException;
 import com.zippyziggy.monolithic.talk.model.Message;
 import com.zippyziggy.monolithic.talk.model.Role;
@@ -87,7 +86,7 @@ public class TalkService {
 	}
 
 	public TalkDetailResponse getTalkDetail(Long talkId, Pageable pageable) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
 
 		Long likeCnt = talkLikeRepository.countAllByTalkId(talkId);
@@ -154,7 +153,7 @@ public class TalkService {
 
 	public List<TalkListResponse> getTalks(List<Talk> talks) {
 		List<TalkListResponse> talkListResponses = talks.stream().map(talk -> {
-			Member currentMember = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
+			Member currentMember = securityUtil.getCurrentMember();
 			String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 			boolean isTalkLiked;
@@ -184,7 +183,7 @@ public class TalkService {
 	}
 
 	public void removeTalk(Long talkId) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Talk talk = talkRepository.findById(talkId)
 				.orElseThrow(TalkNotFoundException::new);
 
