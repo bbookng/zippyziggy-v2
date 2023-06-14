@@ -31,17 +31,17 @@ public class PromptBookmarkRepositoryImpl implements PromptBookmarkCustomReposit
                 .leftJoin(qPromptBookmark)
                 .on(qPromptBookmark.prompt.id.eq(qPrompt.id))
                 .distinct()
-                .where(qPromptBookmark.memberUuid.eq((memberUuid))
+                .where(qPromptBookmark.memberUuid.eq(memberUuid)
                         .and(qPrompt.statusCode.eq(StatusCode.OPEN)));
 
         long totalCount = query.fetchCount();
 
-        List<Prompt> promptList = query.orderBy(qPromptBookmark.regDt.desc())
+        List<Prompt> promptList = query.orderBy(qPromptBookmark.regDt.desc().nullsLast()) // nullsLast() 메서드 추가
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         return new PageImpl<>(promptList, pageable, totalCount);
-
     }
+
 }
