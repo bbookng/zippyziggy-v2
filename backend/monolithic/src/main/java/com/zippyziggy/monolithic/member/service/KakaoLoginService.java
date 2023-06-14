@@ -28,9 +28,9 @@ public class KakaoLoginService {
     private String kakaoClientId;
 
     // json타입을 객체로 변환하기 위한 객체
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     // code를 이용해 kakaoToken 가져오기
     public String kakaoGetToken(String code, String redirectUrl) throws Exception {
