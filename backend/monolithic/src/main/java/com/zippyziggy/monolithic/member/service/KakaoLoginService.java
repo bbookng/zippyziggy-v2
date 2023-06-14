@@ -34,9 +34,6 @@ public class KakaoLoginService {
 
     // code를 이용해 kakaoToken 가져오기
     public String kakaoGetToken(String code, String redirectUrl) throws Exception {
-        log.info("1 -> ", code);
-        log.info("2 -> ", redirectUrl);
-        log.info("3 -> ", kakaoClientId);
         // 요청 URL
         String kakaoTokenUri = "https://kauth.kakao.com/oauth/token";
         // body
@@ -45,7 +42,6 @@ public class KakaoLoginService {
         body.add("client_id", kakaoClientId);
         body.add("redirect_uri", redirectUrl);
         body.add("code", code);
-        log.info("body -> ", body);
         // 카카오에 token 요청
         String token = WebClient.create()
                 .post()
@@ -59,7 +55,6 @@ public class KakaoLoginService {
                 .blockOptional().orElseThrow(
                         () -> new RuntimeException("응답 시간을 초과하였습니다.")
                 );
-        log.info(token);
         // 객체로 전환
         KakaoTokenResponseDto kakaoTokenResponseDto = objectMapper.readValue(token, KakaoTokenResponseDto.class);
         return kakaoTokenResponseDto.getAccess_token();
