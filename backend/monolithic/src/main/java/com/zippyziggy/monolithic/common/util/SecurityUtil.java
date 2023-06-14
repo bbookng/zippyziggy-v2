@@ -4,7 +4,10 @@ import com.zippyziggy.monolithic.member.dto.response.MemberInformResponseDto;
 import com.zippyziggy.monolithic.member.filter.User.CustomUserDetail;
 import com.zippyziggy.monolithic.member.model.Member;
 import com.zippyziggy.monolithic.member.repository.MemberRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -19,16 +22,28 @@ public class SecurityUtil {
 
     @Autowired
     private MemberRepository memberRepository;
+    private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
     // SecurityContext에 저장된 유저 정보 가져오기
-    public Member getCurrentMember() {
+    public Optional<Member> getCurrentMember() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 인증된 유저 가져오기
-        CustomUserDetail principal = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userUuid = principal.getUsername();
+        if (authentication == null) {
+            logger.debug("Security Context에 인증 정보가 없습니다.");
+            return Optional.empty();
+        }
+
+        String userUuid = null;
+        if (authentication.getPrincipal() instanceof CustomUserDetail) {
+            CustomUserDetail springSecurityUser = (CustomUserDetail) authentication.getPrincipal();
+            userUuid = springSecurityUser.getUsername();
+        } else if (authentication.getPrincipal() instanceof String) {
+            userUuid = (String) authentication.getPrincipal();
+        }
+
         UUID uuid = UUID.fromString(userUuid);
 
-        return memberRepository.findByUserUuid(uuid);
+        return Optional.ofNullable(memberRepository.findByUserUuid(uuid));
     }
 
     public UUID getCurrentMemberUUID() {
