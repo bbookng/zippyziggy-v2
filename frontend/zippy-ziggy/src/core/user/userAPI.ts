@@ -246,25 +246,6 @@ export const getPromptsBookmarkAPI = async (requestData: {
 };
 
 /**
- * 맴버가 생성한 프롬프트 조회
- * @param id
- * @param page
- * @param size
- * @returns
- */
-export const getPromptsRecommendAPI = async () => {
-  try {
-    const res = await httpAuth.get(`/prompts/recommender`);
-    if (res.status === 200) {
-      return { result: 'SUCCESS', data: res.data };
-    }
-    return { result: 'FAIL', data: res.data };
-  } catch (err) {
-    return { result: 'FAIL', data: err };
-  }
-};
-
-/**
  * 맴버가 생성한 톡 조회
  * @param id
  * @param page
@@ -294,6 +275,7 @@ export const getTalksProfileAPI = async (requestData: {
   }
 };
 
+// 레디스 삭제로 인해 제거
 export const getTotalVisited = async () => {
   try {
     const res = await http.get(`/members/total/visited`);
@@ -306,6 +288,7 @@ export const getTotalVisited = async () => {
   }
 };
 
+// 레디스 삭제로 인해 제거
 export const getDailyVisited = async () => {
   try {
     const res = await http.get(`/members/daily/visited`);
