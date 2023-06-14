@@ -29,4 +29,6 @@ public interface PromptRepository extends JpaRepository<Prompt, Long> {
 	Page<Prompt> findAllByMemberUuidAndStatusCode(UUID memberUuid, StatusCode statusCode, Pageable pageable);
 
 	Long countAllByOriginPromptUuidAndStatusCode(UUID promptUuid, StatusCode statusCode);
+
+	Page<Prompt> findAllByStatusCodeAndPromptBookmarksMemberUuid(StatusCode statusCode, UUID memberUuid, Pageable pageable);
 }
