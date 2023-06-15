@@ -56,7 +56,8 @@ public class SecurityUtil {
 
         CustomUserDetail principal = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userUuid = principal.getUsername();
-        UUID uuid = UUID.fromString(userUuid);
+        UUID uuid = UUID.
+                fromString(userUuid);
 
         return null;
     }

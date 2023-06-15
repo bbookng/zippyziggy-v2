@@ -664,6 +664,41 @@ public class PromptService{
 		return SearchPromptList.of(totalPromptsCnt, totalPageCnt, searchPrompts);
 	}
 
+	public ExtensionSearchPromptList searchPromptsForExtension(
+			String crntMemberUuid,
+			String keyword,
+			String category,
+			Integer page,
+			Integer size,
+			String sort
+	) {
+		final Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
+		final Pageable pageable = PageRequest.of(page, size, sortBy);
+
+		final Page<Prompt> pagedPrompt = search(keyword, category, pageable);
+		final long totalPromptsCnt = pagedPrompt.getTotalElements();
+		final int totalPageCnt = pagedPrompt.getTotalPages();
+
+		final List<ExtensionSearchPrompt> searchPrompts = new ArrayList<>();
+		for (Prompt prompt : pagedPrompt) {
+			// prompt 관련 필요한 정보 조회
+			final UUID promptUuid = prompt.getPromptUuid();
+			final SearchPromptResponse fromPrompt = searchPrompt(promptUuid);
+
+			// 사용자 조회
+			final MemberResponse member = getMemberInfo(prompt.getMemberUuid());
+			final WriterResponse writer = member.toWriterResponse();
+
+			// dto로 변환하기
+			searchPrompts.add(ExtensionSearchPrompt.of(
+					prompt,
+					fromPrompt,
+					writer));
+
+		}
+		return ExtensionSearchPromptList.of(totalPromptsCnt, totalPageCnt, searchPrompts);
+	}
+
 	private Page<Prompt> search(
 			String keyword,
 			String category,
@@ -673,23 +708,29 @@ public class PromptService{
 		keyword = (keyword.equals("")) ? null : keyword;
 		category = (category.equals("ALL")) ? null : category;
 
-		if (null != keyword & null != category) {
-			pagedEsPrompt = promptRepository
-					.findByKeywordAndCategory(keyword, category, pageable);
+		Category enumCategory = null;
+		if (null != category) {
+			enumCategory = Category.valueOf(category);
+		}
 
-		} else if (null == keyword & null != category) {
+		if (null != keyword & null != enumCategory) {
 			pagedEsPrompt = promptRepository
-					.findByCategory(category, pageable);
+					.findByKeywordAndCategory(keyword, enumCategory, pageable);
 
-		} else if (null != keyword & null == category) {
+		} else if (null == keyword & null != enumCategory) {
+			pagedEsPrompt = promptRepository
+					.findByCategory(enumCategory, pageable);
+
+		} else if (null != keyword & null == enumCategory) {
 			pagedEsPrompt = promptRepository
 					.findByKeywordOnly(keyword, pageable);
 
-		} else if (null == keyword & null == category) {
+		} else if (null == keyword & null == enumCategory) {
 			pagedEsPrompt = promptRepository
 					.findAll(pageable);
 		}
 
 		return pagedEsPrompt;
 	}
+
 }
