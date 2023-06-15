@@ -168,8 +168,8 @@ public class TalkService {
             }
             Long talkLikeCnt = talkLikeRepository.countAllByTalkId(talk.getId());
             Long talkCommentCnt = talkCommentRepository.countAllByTalk_Id(talk.getId());
-            String question = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.USER).getContent().toString();
-            String answer = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.ASSISTANT).getContent().toString();
+            String question = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.USER).getContent();
+            String answer = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.ASSISTANT).getContent();
             MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
 
             return talk.from(
@@ -181,6 +181,7 @@ public class TalkService {
                     isTalkLiked);
 
         }).collect(Collectors.toList());
+
         return talkListResponses;
     }
 

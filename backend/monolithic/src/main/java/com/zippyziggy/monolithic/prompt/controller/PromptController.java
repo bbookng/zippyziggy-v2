@@ -240,9 +240,6 @@ public class PromptController {
 
     /**
      * 프롬프트 검색 결과에 필요한 정보를 보낸다.
-     *
-     * @param promptUuid
-     * @return
      */
     @Operation(hidden = true)
     @GetMapping("/search/{promptUuid}")
