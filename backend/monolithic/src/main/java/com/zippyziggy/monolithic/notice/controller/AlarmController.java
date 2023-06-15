@@ -37,7 +37,7 @@ public class AlarmController {
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	public ResponseEntity<SseEmitter> subscribe(@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
-												HttpServletResponse response, @RequestHeader String crntMemberUuid) {
+												HttpServletResponse response) {
 
 		// HTTP1.1에서는 keep-alive가 기본 속성이지만 HTTP1.0같은 경우는 명시해줘야해서 헤더에 기입
 		response.setHeader("Connection", "keep-alive");
@@ -50,7 +50,7 @@ public class AlarmController {
 		// 그래서 버퍼링을 하지 않도록 아래와 같이 헤더에 추가해준다.
 		response.setHeader("X-Accel-Buffering", "no");
 
-		return ResponseEntity.ok(alarmService.subscribe(crntMemberUuid, lastEventId));
+		return ResponseEntity.ok(alarmService.subscribe(lastEventId));
 
 	}
 
@@ -73,8 +73,8 @@ public class AlarmController {
 			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	public ResponseEntity<?> deleteAlarmAll(@RequestHeader String crntMemberUuid) {
-		alarmService.deleteAlarmByMemberUuid(crntMemberUuid);
+	public ResponseEntity<?> deleteAlarmAll() {
+		alarmService.deleteAlarmByMemberUuid();
 		return ResponseEntity.ok("유저관련 알람 전체 삭제 완료");
 	}
 
@@ -97,8 +97,8 @@ public class AlarmController {
 			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	public ResponseEntity<?> readAlarmAllByMemberUuid(@RequestHeader String crntMemberUuid) {
-		alarmService.readAlarmAllByMemberUuid(crntMemberUuid);
+	public ResponseEntity<?> readAlarmAllByMemberUuid() {
+		alarmService.readAlarmAllByMemberUuid();
 		return ResponseEntity.ok("해당 유저의 알람 모두 읽기 완료");
 	}
 
@@ -109,10 +109,9 @@ public class AlarmController {
 			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	public ResponseEntity<List<AlarmEntity>> findMemberAlarmList(@RequestHeader String crntMemberUuid,
-																 @RequestParam("page") Integer page,
+	public ResponseEntity<List<AlarmEntity>> findMemberAlarmList(@RequestParam("page") Integer page,
 																 @RequestParam("size") Integer size) {
-		return ResponseEntity.ok(alarmService.findMemberAlarmList(crntMemberUuid, page, size));
+		return ResponseEntity.ok(alarmService.findMemberAlarmList(page, size));
 	}
 
 	@Operation(summary = "해당 유저의 읽지 않은 알림 개수 조회", description = "memberUuid를 pathvariable로 보내면 해당 유저의 읽지 않은 알림 총 개수를 반환해준다.")
@@ -122,8 +121,8 @@ public class AlarmController {
 			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	public ResponseEntity<Long> countUnReadAlarmByMemberUuid(@RequestHeader String crntMemberUuid) {
-		return ResponseEntity.ok(alarmService.countUnReadAlarmByMemberUuid(crntMemberUuid));
+	public ResponseEntity<Long> countUnReadAlarmByMemberUuid() {
+		return ResponseEntity.ok(alarmService.countUnReadAlarmByMemberUuid());
 	}
 
 

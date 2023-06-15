@@ -14,7 +14,6 @@ import com.zippyziggy.monolithic.prompt.model.*;
 import com.zippyziggy.monolithic.prompt.repository.*;
 import com.zippyziggy.monolithic.talk.dto.response.PromptTalkListResponse;
 import com.zippyziggy.monolithic.talk.dto.response.TalkListResponse;
-import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import com.zippyziggy.monolithic.talk.repository.TalkRepository;
 import com.zippyziggy.monolithic.talk.service.TalkService;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +71,7 @@ public class PromptService{
 
 	// Exception 처리 필요
 	public PromptResponse createPrompt(PromptRequest data, MultipartFile thumbnail) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		String thumbnailUrl;
 
 		if (thumbnail == null) {
@@ -89,7 +88,7 @@ public class PromptService{
 	}
 
 	public PromptResponse modifyPrompt(UUID promptUuid, PromptRequest data, MultipartFile thumbnail) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
 				.orElseThrow(PromptNotFoundException::new);
@@ -175,7 +174,7 @@ public class PromptService{
 	}
 
 	public PromptDetailResponse getPromptDetail(UUID promptUuid) {
-		Member currentMember = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
+		Member currentMember = securityUtil.getCurrentMember();
 		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
 		final Prompt prompt = promptRepository
@@ -247,7 +246,7 @@ public class PromptService{
 	 */
 
 	public void removePrompt(String promptUuid) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(UUID.fromString(promptUuid), StatusCode.OPEN)
 				.orElseThrow(PromptNotFoundException::new);
@@ -268,7 +267,7 @@ public class PromptService{
      */
 
 	public void likePrompt(UUID promptUuid) {
-		String crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid().toString();
+		String crntMemberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
 
 		// 좋아요 상태 추적
 		PromptLike promptLikeExist = likePromptExist(promptUuid);
@@ -315,12 +314,12 @@ public class PromptService{
      */
 
 	private PromptLike likePromptExist(UUID promptUuid) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
 				.orElseThrow(PromptNotFoundException::new);
-		PromptLike promptLike = promptLikeRepository.findByPromptAndMemberUuid(prompt, crntMemberUuid).orElseThrow(PromptNotFoundException::new);
+		PromptLike promptLike = promptLikeRepository.findByPromptAndMemberUuid(prompt, crntMemberUuid).orElse(null);
 		if (promptLike != null) {
 			return promptLike;
 		} else {
@@ -331,12 +330,13 @@ public class PromptService{
     /*
     로그인한 유저가 좋아요를 누른 프롬프트 조회하기, PromptCard 타입의 리스트 형식으로 응답
      */
-	public PromptCardListResponse likePromptsByMember (Pageable pageable) {
-		UUID crntMemberUuid = securityUtil.getCurrentMemberUUID();
+	public PromptCardListResponse likePromptsByMember (String userUuid, Pageable pageable) {
 
-		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
-		final long totalPromptsCnt = prompts.getTotalElements();
-		final int totalPageCnt = prompts.getTotalPages();
+		UUID crntMemberUuid = UUID.fromString(userUuid);
+
+		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuidAndStatusCode(crntMemberUuid, StatusCode.OPEN, pageable);
+		long totalPromptsCnt = prompts.getTotalElements();
+		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
 
 		for (Prompt prompt: prompts) {
@@ -363,11 +363,11 @@ public class PromptService{
     북마크 등록 및 삭제
      */
 	public void bookmarkPrompt(UUID promptUuid) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Prompt prompt = promptRepository
 				.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN)
 				.orElseThrow(PromptNotFoundException::new);
-		PromptBookmark promptBookmark = promptBookmarkRepository.findByMemberUuidAndPrompt(crntMemberUuid, prompt).orElseThrow(PromptNotFoundException::new);
+		PromptBookmark promptBookmark = promptBookmarkRepository.findByMemberUuidAndPrompt(crntMemberUuid, prompt).orElse(null);
 		if (promptBookmark == null) {
 			promptBookmarkRepository.save(PromptBookmark.from(prompt, crntMemberUuid));
 		} else {
@@ -379,12 +379,15 @@ public class PromptService{
 	/*
     북마크 조회하기
      */
-	public PromptCardListResponse bookmarkPromptByMember(Pageable pageable) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+	public PromptCardListResponse bookmarkPromptByMember(String memberUuid, Pageable pageable) {
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
-		final long totalPromptsCnt = prompts.getTotalElements();
-		final int totalPageCnt = prompts.getTotalPages();
+		UUID crntMemberUuid = UUID.fromString(memberUuid);
+
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuidAndStatusCode(crntMemberUuid, StatusCode.OPEN, pageable);
+
+//		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
+		long totalPromptsCnt = prompts.getTotalElements();
+		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
 
 		for (Prompt prompt : prompts) {
@@ -410,7 +413,7 @@ public class PromptService{
 	public PromptCardListExtensionResponse bookmarkPromptByMemberAndExtension(String crntMemberUuid, Pageable pageable) {
 		log.info(String.valueOf(pageable.getSort()));
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuidAndStatusCode(UUID.fromString(crntMemberUuid), StatusCode.OPEN, pageable);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 
@@ -448,7 +451,7 @@ public class PromptService{
     프롬프트 평가
      */
 	public void ratingPrompt(UUID promptUuid, PromptRatingRequest promptRatingRequest) throws Exception {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Rating ratingExist = ratingRepository.findByMemberUuidAndPromptPromptUuid(crntMemberUuid, promptUuid);
 
 		if (ratingExist == null) {
@@ -466,10 +469,10 @@ public class PromptService{
     프롬프트 톡 및 댓글 개수 조회
      */
 	public SearchPromptResponse searchPrompt(UUID promptUuid) {
-		Member currentMember = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new);
+		Member currentMember = securityUtil.getCurrentMember();
 		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
-		final Prompt prompt = promptRepository
+		Prompt prompt = promptRepository
 				.findByPromptUuid(promptUuid)
 				.orElseThrow(PromptNotFoundException::new);
 
@@ -497,7 +500,7 @@ public class PromptService{
     프롬프트 신고 접수 한 프롬프트 당 5개까지 작성가능
      */
 	public void promptReport(UUID promptUuid, PromptReportRequest promptReportRequest) throws Exception {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Long reportCnt = promptReportRepository.countAllByMemberUuidAndPrompt_PromptUuid(crntMemberUuid, promptUuid);
 		if (reportCnt <= 5 ) {
 			Prompt prompt = promptRepository

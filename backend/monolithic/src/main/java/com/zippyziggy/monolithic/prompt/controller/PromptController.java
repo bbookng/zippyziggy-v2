@@ -195,7 +195,7 @@ public class PromptController {
 												@RequestParam("size") Integer size) {
 
 		PageRequest pageRequest = PageRequest.of(page, size);
-		return ResponseEntity.ok(promptService.likePromptsByMember(pageRequest));
+		return ResponseEntity.ok(promptService.likePromptsByMember(crntMemberUuid, pageRequest));
 	}
 
 	@Operation(summary = "프롬프트 북마크 하기(Authorization 필요)", description = "프롬프트 북마크 처리 진행. prompt의 UUID를 Pathvariable로 제공해야한다.")
@@ -205,14 +205,6 @@ public class PromptController {
 		return ResponseEntity.ok("프롬프트 북마크 진행 완료");
 	}
 
-	@Operation(hidden = true)
-	@GetMapping("/members/bookmark/{crntMemberUuid}")
-	public ResponseEntity<PromptCardListResponse> bookmarkPromptByMember(@PathVariable String crntMemberUuid,
-																		   @RequestParam("page") Integer page,
-																		   @RequestParam("size") Integer size) {
-		PageRequest pageRequest = PageRequest.of(page, size);
-		return ResponseEntity.ok(promptService.bookmarkPromptByMember(pageRequest));
-	}
 
 	@Operation(summary = "프롬프트 평가", description = "헤더에는 accessToken을 담고, promptUuid를 pathVariable로 전달 필요")
 	@PostMapping("/{promptUuid}/rating")

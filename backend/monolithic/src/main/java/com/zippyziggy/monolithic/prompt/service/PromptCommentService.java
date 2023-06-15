@@ -15,7 +15,6 @@ import com.zippyziggy.monolithic.prompt.model.PromptComment;
 import com.zippyziggy.monolithic.prompt.model.StatusCode;
 import com.zippyziggy.monolithic.prompt.repository.PromptCommentRepository;
 import com.zippyziggy.monolithic.prompt.repository.PromptRepository;
-import com.zippyziggy.monolithic.talk.exception.MemberNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -57,7 +56,7 @@ public class PromptCommentService {
 	}
 
 	public PromptCommentResponse createPromptComment(UUID promptUuid, PromptCommentRequest data) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		Prompt prompt = promptRepository.findByPromptUuidAndStatusCode(promptUuid, StatusCode.OPEN).orElseThrow(PromptNotFoundException::new);
 
 		PromptComment promptComment = PromptComment.from(data, crntMemberUuid, prompt);
@@ -70,7 +69,7 @@ public class PromptCommentService {
 	본인 댓글인지 확인하고 수정
 	 */
 	public PromptCommentResponse modifyPromptComment(Long commentId, PromptCommentRequest data) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		PromptComment comment = promptCommentRepository.findById(commentId)
 			.orElseThrow(PromptCommentNotFoundException::new);
 
@@ -87,7 +86,7 @@ public class PromptCommentService {
 	본인 댓글인지 확인하고 삭제
 	 */
 	public void removePromptComment(Long commentId) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().orElseThrow(MemberNotFoundException::new).getUserUuid();
+		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		PromptComment comment = promptCommentRepository.findById(commentId)
 			.orElseThrow(PromptCommentNotFoundException::new);
 

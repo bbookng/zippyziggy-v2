@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -25,12 +24,12 @@ public class SecurityUtil {
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
     // SecurityContext에 저장된 유저 정보 가져오기
-    public Optional<Member> getCurrentMember() {
+    public Member getCurrentMember() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
             logger.debug("Security Context에 인증 정보가 없습니다.");
-            return Optional.empty();
+            return null;
         }
 
         String userUuid = null;
@@ -41,9 +40,16 @@ public class SecurityUtil {
             userUuid = (String) authentication.getPrincipal();
         }
 
-        UUID uuid = UUID.fromString(userUuid);
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(userUuid);
+        } catch (IllegalArgumentException e) {
+            logger.debug("유효하지 않은 UUID 문자열입니다.");
+            return null;
+        }
 
-        return Optional.ofNullable(memberRepository.findByUserUuid(uuid));
+
+        return memberRepository.findByUserUuid(uuid);
     }
 
     public UUID getCurrentMemberUUID() {

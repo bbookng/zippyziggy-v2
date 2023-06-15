@@ -1,5 +1,6 @@
 package com.zippyziggy.monolithic.notice.service;
 
+import com.zippyziggy.monolithic.common.util.SecurityUtil;
 import com.zippyziggy.monolithic.notice.entity.Alarm;
 import com.zippyziggy.monolithic.notice.entity.AlarmEntity;
 import com.zippyziggy.monolithic.notice.repository.AlarmEntityRepository;
@@ -26,9 +27,11 @@ public class AlarmService {
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 10; // 10분으로 설정
     private final AlarmRepository alarmRepository;
     private final AlarmEntityRepository alarmEntityRepository;
+    private final SecurityUtil securityUtil;
 
     @Transactional
-    public SseEmitter subscribe(String memberUuid, String lastEventId) {
+    public SseEmitter subscribe(String lastEventId) {
+        String memberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
 
         String emitterId = makeTimeIncludeId(memberUuid);
 
@@ -179,7 +182,8 @@ public class AlarmService {
 
     // 해당 유저의 알림 모두 삭제
     @Transactional
-    public void deleteAlarmByMemberUuid(String memberUuid) {
+    public void deleteAlarmByMemberUuid() {
+        String memberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
         alarmEntityRepository.deleteAllByMemberUuid(memberUuid);
     }
 
@@ -193,20 +197,23 @@ public class AlarmService {
     }
 
     // 해당 유저의 알람 모두 가져오기
-    public List<AlarmEntity> findMemberAlarmList(String memberUuid, Integer page, Integer size) {
+    public List<AlarmEntity> findMemberAlarmList(Integer page, Integer size) {
+        String memberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
         PageRequest pageRequest = PageRequest.of(page, size);
         return alarmEntityRepository.findAllByMemberUuidOrderByIdDesc(memberUuid, pageRequest);
 
     }
 
     // 해당 유저의 읽지 않은 알람 개수 가져오기
-    public Long countUnReadAlarmByMemberUuid(String memberUuid) {
+    public Long countUnReadAlarmByMemberUuid() {
+        String memberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
         return alarmEntityRepository.countByMemberUuidAndIsReadFalse(memberUuid);
     }
 
     // 모두 읽음 처리 진행하기
     @Transactional
-    public void readAlarmAllByMemberUuid(String memberUuid) {
+    public void readAlarmAllByMemberUuid() {
+        String memberUuid = securityUtil.getCurrentMember().getUserUuid().toString();
         List<AlarmEntity> alarms = alarmEntityRepository.findAllByMemberUuidAndIsReadFalse(memberUuid);
         for (AlarmEntity alarm : alarms) {
             alarm.setRead(true);
