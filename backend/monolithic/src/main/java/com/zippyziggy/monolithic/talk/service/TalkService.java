@@ -70,8 +70,9 @@ public class TalkService {
 	}
 
 	// promptUuid가 있는지 없는지에 따라 -> 프롬프트 활용 or 그냥 대화
-	public TalkResponse createTalk(TalkRequest data, UUID crntMemberUuid) {
-		Talk talk = Talk.from(data, crntMemberUuid);
+	public TalkResponse createTalk(TalkRequest data) {
+		UUID userUuid = securityUtil.getCurrentMember().getUserUuid();
+		Talk talk = Talk.from(data, userUuid);
 		talkRepository.save(talk);
 		List<Message> messageList = data.getMessages().stream().map(message -> Message.from(message, talk)).collect(
 				Collectors.toList());
@@ -86,16 +87,17 @@ public class TalkService {
 	}
 
 	public TalkDetailResponse getTalkDetail(Long talkId, Pageable pageable) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+		Member currentMember = securityUtil.getCurrentMember();
+		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 		Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
 
 		Long likeCnt = talkLikeRepository.countAllByTalkId(talkId);
 		boolean isLiked;
 
-		if (crntMemberUuid.equals("defaultValue")) {
+		if (crntMemberUuid == null) {
 			isLiked = false;
 		} else {
-			isLiked = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, crntMemberUuid);
+			isLiked = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid));
 		}
 
 		MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
@@ -129,7 +131,7 @@ public class TalkService {
 		boolean isBookmarked;
 
 		// 현재 로그인된 사용자가 아니면 기본값 false
-		if (crntMemberUuid.equals("defaultValue")) {
+		if (crntMemberUuid == null) {
 			isBookmarked = false;
 			isOriginLiked = false;
 		} else {
@@ -194,9 +196,13 @@ public class TalkService {
 		talkRepository.delete(talk);
 	}
 
-	public void likeTalk(Long talkId, UUID crntMemberUuid) {
+	public void likeTalk(Long talkId) {
+
+		Member currentMember = securityUtil.getCurrentMember();
+		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
+
 		// 좋아요 상태
-		Boolean talkLikeExist = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, crntMemberUuid);
+		Boolean talkLikeExist = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid));
 
 		Talk talk = talkRepository.findById(talkId)
 			.orElseThrow(TalkNotFoundException::new);
@@ -205,7 +211,7 @@ public class TalkService {
 			// 톡 좋아요 조회
 			TalkLike talkLike = TalkLike.builder()
 				.talk(talk)
-				.memberUuid(crntMemberUuid)
+				.memberUuid(UUID.fromString(crntMemberUuid))
 				.regDt(LocalDateTime.now()).build();
 
 			// 톡 - 사용자 좋아요 관계 생성
@@ -219,7 +225,7 @@ public class TalkService {
 
 			// 프롬프트 - 사용자 좋아요 취소
 			TalkLike talkLike = talkLikeRepository
-				.findByTalk_IdAndMemberUuid(talkId, crntMemberUuid)
+				.findByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid))
 				.orElseThrow(TalkNotFoundException::new);
 			talkLikeRepository.delete(talkLike);
 

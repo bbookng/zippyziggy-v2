@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/talks")
@@ -40,9 +39,8 @@ public class TalkController {
 			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	public ResponseEntity<TalkResponse> createTalk(@RequestBody TalkRequest data,
-												   @RequestHeader String crntMemberUuid) {
-		return ResponseEntity.ok(talkService.createTalk(data, UUID.fromString(crntMemberUuid)));
+	public ResponseEntity<TalkResponse> createTalk(@RequestBody TalkRequest data) {
+		return ResponseEntity.ok(talkService.createTalk(data));
 	}
 
 	@Operation(summary = "톡 삭제", description = "톡을 삭제한다.")
@@ -68,7 +66,6 @@ public class TalkController {
 	})
 	public ResponseEntity<TalkDetailResponse> getTalkDetail(
 		@PathVariable Long talkId,
-		@RequestHeader String crntMemberUuid,
 		@PageableDefault(sort = "regDt",  direction = Sort.Direction.DESC) Pageable pageable,
 		HttpServletRequest request,
 		HttpServletResponse response
@@ -140,10 +137,9 @@ public class TalkController {
 			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
 	public ResponseEntity<Void> likeTalk(
-			@PathVariable Long talkId,
-			@RequestHeader String crntMemberUuid
+			@PathVariable Long talkId
 	) {
-		talkService.likeTalk(talkId, UUID.fromString(crntMemberUuid));
+		talkService.likeTalk(talkId);
 		return ResponseEntity.ok().build();
 	}
 
