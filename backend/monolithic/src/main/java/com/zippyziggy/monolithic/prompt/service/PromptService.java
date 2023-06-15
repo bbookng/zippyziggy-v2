@@ -331,9 +331,9 @@ public class PromptService{
 
 		UUID crntMemberUuid = UUID.fromString(userUuid);
 
-		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
-		final long totalPromptsCnt = prompts.getTotalElements();
-		final int totalPageCnt = prompts.getTotalPages();
+		Page<Prompt> prompts = promptLikeRepository.findAllPromptsByMemberUuidAndStatusCode(crntMemberUuid, StatusCode.OPEN, pageable);
+		long totalPromptsCnt = prompts.getTotalElements();
+		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
 
 		for (Prompt prompt: prompts) {
@@ -380,7 +380,9 @@ public class PromptService{
 
 		UUID crntMemberUuid = UUID.fromString(memberUuid);
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuidAndStatusCode(crntMemberUuid, StatusCode.OPEN, pageable);
+
+//		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(crntMemberUuid, pageable);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 		List<PromptCardResponse> promptCardResponses = new ArrayList<>();
@@ -408,7 +410,7 @@ public class PromptService{
 	public PromptCardListExtensionResponse bookmarkPromptByMemberAndExtension(String crntMemberUuid, Pageable pageable) {
 		log.info(String.valueOf(pageable.getSort()));
 
-		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+		Page<Prompt> prompts = promptBookmarkRepository.findAllPromptsByMemberUuidAndStatusCode(UUID.fromString(crntMemberUuid), StatusCode.OPEN, pageable);
 		long totalPromptsCnt = prompts.getTotalElements();
 		int totalPageCnt = prompts.getTotalPages();
 
@@ -467,7 +469,7 @@ public class PromptService{
 		Member currentMember = securityUtil.getCurrentMember();
 		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
 
-		final Prompt prompt = promptRepository
+		Prompt prompt = promptRepository
 				.findByPromptUuid(promptUuid)
 				.orElseThrow(PromptNotFoundException::new);
 
