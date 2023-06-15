@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import Paging from '@/components/Paging/Paging';
 import useDebounce from '@/hooks/useDebounce';
-import { getPromptList } from '@/core/prompt/promptAPI';
 import { FiPlus } from 'react-icons/fi';
 import TalkCard from '@/components/TalkCard/TalkCard';
 import { getTalksListAPI } from '@/core/talk/talkAPI';
