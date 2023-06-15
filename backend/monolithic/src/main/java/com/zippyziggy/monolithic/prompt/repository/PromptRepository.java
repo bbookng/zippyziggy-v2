@@ -31,16 +31,14 @@ public interface PromptRepository extends JpaRepository<Prompt, Long> {
 
 	Long countAllByOriginPromptUuidAndStatusCode(UUID promptUuid, StatusCode statusCode);
 
-	@Query("" +
-			"select p " +
+	@Query(	"select p " +
 			"from Prompt p " +
 			"where (p.title like %:keyword% or p.description like %:keyword% or p.prefix like %:keyword% or p.suffix like %:keyword% or p.example like %:keyword%) and (p.category = :category)")
     Page<Prompt> findByKeywordAndCategory(String keyword, Category category, Pageable pageable);
 
 	Page<Prompt> findByCategory(Category category, Pageable pageable);
 
-	@Query("" +
-			"select p " +
+	@Query( "select p " +
 			"from Prompt p " +
 			"where p.title like %:keyword% or p.description like %:keyword% or p.prefix like %:keyword% or p.suffix like %:keyword% or p.example like %:keyword%")
 	Page<Prompt> findByKeywordOnly(String keyword, Pageable pageable);

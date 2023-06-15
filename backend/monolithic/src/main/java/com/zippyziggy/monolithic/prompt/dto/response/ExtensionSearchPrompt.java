@@ -18,7 +18,7 @@ public class ExtensionSearchPrompt {
 
         String originalPromptUuid = null == prompt.getOriginPromptUuid() ? "" : prompt.getOriginPromptUuid().toString();
         long regDt = prompt.getRegDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
-        long updDt = prompt.getRegDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
+        long updDt = prompt.getUpdDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
 
         return ExtensionSearchPrompt.builder()
                 .promptUuid(prompt.getPromptUuid().toString())
@@ -31,7 +31,7 @@ public class ExtensionSearchPrompt {
                 .originalPromptUuid(originalPromptUuid)
                 .regDt(regDt)
                 .updDt(updDt)
-                .likeCnt(prompt.getLikeCnt().longValue())
+                .likeCnt(prompt.getLikeCnt())
                 .hit(prompt.getHit())
 
                 .thumbnail(fromPrompt.getThumbnail())

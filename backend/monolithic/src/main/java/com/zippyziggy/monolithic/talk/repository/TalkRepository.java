@@ -23,4 +23,8 @@ public interface TalkRepository extends JpaRepository<Talk, Long> {
 	@Modifying
 	@Query("update Talk set hit = hit + 1 where id = :talkId")
 	int updateHit(@Param(value = "talkId") Long talkId);
+
+	@Query("select distinct t from Talk t left join t.messages m where t.title like %:keyword% or m.content like %:keyword%")
+    Page<Talk> findByKeywordOnly(String keyword, Pageable pageable);
+
 }

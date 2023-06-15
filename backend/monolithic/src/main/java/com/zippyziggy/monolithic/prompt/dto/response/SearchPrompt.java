@@ -17,7 +17,7 @@ public class SearchPrompt {
     ) {
         String originalPromptUuid = null == prompt.getOriginPromptUuid() ? "" : prompt.getOriginPromptUuid().toString();
         long regDt = prompt.getRegDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
-        long updDt = prompt.getRegDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
+        long updDt = prompt.getUpdDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
 
         return SearchPrompt.builder()
                 .promptUuid(prompt.getPromptUuid().toString())
@@ -27,7 +27,7 @@ public class SearchPrompt {
                 .originalPromptUuid(originalPromptUuid)
                 .regDt(regDt)
                 .updDt(updDt)
-                .likeCnt(prompt.getLikeCnt().longValue())
+                .likeCnt(prompt.getLikeCnt())
                 .hit(prompt.getHit())
 
                 .thumbnail(prompt.getThumbnail())

@@ -50,279 +50,321 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TalkService {
 
-	private final TalkRepository talkRepository;
-	private final TalkLikeRepository talkLikeRepository;
-	private final PromptRepository promptRepository;
-	private final PromptCommentRepository promptCommentRepository;
-	private final PromptBookmarkRepository promptBookmarkRepository;
-	private final PromptLikeRepository promptLikeRepository;
-	private final MessageRepository messageRepository;
-	private final TalkCommentRepository talkCommentRepository;
-	private final MemberRepository memberRepository;
-	private final SecurityUtil securityUtil;
+    private final TalkRepository talkRepository;
+    private final TalkLikeRepository talkLikeRepository;
+    private final PromptRepository promptRepository;
+    private final PromptCommentRepository promptCommentRepository;
+    private final PromptBookmarkRepository promptBookmarkRepository;
+    private final PromptLikeRepository promptLikeRepository;
+    private final MessageRepository messageRepository;
+    private final TalkCommentRepository talkCommentRepository;
+    private final MemberRepository memberRepository;
+    private final SecurityUtil securityUtil;
 
 
-	private static final String VIEWCOOKIENAME = "alreadyViewCookie";
+    private static final String VIEWCOOKIENAME = "alreadyViewCookie";
 
-	// 은지가 짤거임, 지금 검색 안됨 그냥 전체 조회
-	public List<TalkListResponse> getTalkList(String crntMemberUuid) {
-		return getTalks(talkRepository.findAll());
-	}
-
-	// promptUuid가 있는지 없는지에 따라 -> 프롬프트 활용 or 그냥 대화
-	public TalkResponse createTalk(TalkRequest data) {
-		UUID userUuid = securityUtil.getCurrentMember().getUserUuid();
-		Talk talk = Talk.from(data, userUuid);
-		talkRepository.save(talk);
-		List<Message> messageList = data.getMessages().stream().map(message -> Message.from(message, talk)).collect(
-				Collectors.toList());
-		talk.setMessages(messageList);
-		if (data.getPromptUuid() != null) {
-			talk.setPrompt(promptRepository
-				.findByPromptUuidAndStatusCode(UUID.fromString(data.getPromptUuid()), StatusCode.OPEN)
-				.orElseThrow(PromptNotFoundException::new));
-		}
-
-		return talk.toTalkResponse();
-	}
-
-	public TalkDetailResponse getTalkDetail(Long talkId, Pageable pageable) {
-		Member currentMember = securityUtil.getCurrentMember();
-		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
-		Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
-
-		Long likeCnt = talkLikeRepository.countAllByTalkId(talkId);
-		boolean isLiked;
-
-		if (crntMemberUuid == null) {
-			isLiked = false;
-		} else {
-			isLiked = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid));
-		}
-
-		MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
-
-		TalkDetailResponse response = talk.toDetailResponse(isLiked, likeCnt, memberResponse);
-
-		if (talk.getPrompt() != null) {
-			Prompt originPrompt = talk.getPrompt();
-
-			MemberResponse originMember = getMemberInfo(originPrompt.getMemberUuid());
-
-			PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid.toString(), originPrompt, originMember);
-
-			List<TalkListResponse> talkListResponses = getTalkListResponses(originPrompt, pageable);
-
-			response.setOriginMember(originMember);
-			response.setOriginPrompt(promptCardResponse);
-			response.setTalkList(talkListResponses);
-		}
-		return response;
-
-	}
-
-	private PromptCardResponse getPromptCardResponse(String crntMemberUuid, Prompt originPrompt, MemberResponse originMember) {
-		long commentCnt = promptCommentRepository.countAllByPromptPromptUuid(originPrompt.getPromptUuid());
-		long forkCnt = promptRepository.countAllByOriginPromptUuidAndStatusCode(originPrompt.getPromptUuid(), StatusCode.OPEN);
-		long talkCnt = talkRepository.countAllByPromptPromptUuid(originPrompt.getPromptUuid());
-
-		// 좋아요, 북마크 여부
-		boolean isOriginLiked;
-		boolean isBookmarked;
-
-		// 현재 로그인된 사용자가 아니면 기본값 false
-		if (crntMemberUuid == null) {
-			isBookmarked = false;
-			isOriginLiked = false;
-		} else {
-			isBookmarked = promptBookmarkRepository.findByMemberUuidAndPrompt(UUID.fromString(crntMemberUuid), originPrompt).isPresent();
-			isOriginLiked =  promptLikeRepository.findByPromptAndMemberUuid(originPrompt, UUID.fromString(crntMemberUuid)).isPresent();
-		}
-
-		PromptCardResponse promptCardResponse = PromptCardResponse
-				.from(originMember, originPrompt, commentCnt, forkCnt, talkCnt, isBookmarked, isOriginLiked);
-		return promptCardResponse;
-	}
-
-	public List<TalkListResponse> getTalkListResponses(Prompt originPrompt,  Pageable pageable) {
-
-		List<Talk> talks = talkRepository.findAllByPromptPromptUuid(originPrompt.getPromptUuid(), pageable).toList();
-
-		List<TalkListResponse> talkListResponses = getTalks(talks);
-
-		return talkListResponses;
-	}
-
-	public List<TalkListResponse> getTalks(List<Talk> talks) {
-		List<TalkListResponse> talkListResponses = talks.stream().map(talk -> {
-			Member currentMember = securityUtil.getCurrentMember();
-			String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
-
-			boolean isTalkLiked;
-
-			if (crntMemberUuid == null) {
-				isTalkLiked = false;
-			} else {
-				isTalkLiked = talkLikeRepository
-						.findByTalk_IdAndMemberUuid(talk.getId(), UUID.fromString(crntMemberUuid)).isPresent();
-			}
-			Long talkLikeCnt = talkLikeRepository.countAllByTalkId(talk.getId());
-			Long talkCommentCnt = talkCommentRepository.countAllByTalk_Id(talk.getId());
-			String question = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.USER).getContent().toString();
-			String answer = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.ASSISTANT).getContent().toString();
-			MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
-
-			return talk.from(
-					question,
-					answer,
-					memberResponse,
-					talkLikeCnt,
-					talkCommentCnt,
-					isTalkLiked);
-
-		}).collect(Collectors.toList());
-		return talkListResponses;
-	}
-
-	public void removeTalk(Long talkId) {
-		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
-		Talk talk = talkRepository.findById(talkId)
-				.orElseThrow(TalkNotFoundException::new);
-
-		if (!crntMemberUuid.equals(talk.getMemberUuid())) {
-			throw new ForbiddenMemberException();
-		}
-
-		talkRepository.delete(talk);
-	}
-
-	public void likeTalk(Long talkId) {
-
-		Member currentMember = securityUtil.getCurrentMember();
-		String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
-
-		// 좋아요 상태
-		Boolean talkLikeExist = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid));
-
-		Talk talk = talkRepository.findById(talkId)
-			.orElseThrow(TalkNotFoundException::new);
-
-		if (!talkLikeExist) {
-			// 톡 좋아요 조회
-			TalkLike talkLike = TalkLike.builder()
-				.talk(talk)
-				.memberUuid(UUID.fromString(crntMemberUuid))
-				.regDt(LocalDateTime.now()).build();
-
-			// 톡 - 사용자 좋아요 관계 생성
-			talkLikeRepository.save(talkLike);
-
-			// 프롬프트 좋아요 개수 1 증가
-			talk.setLikeCnt(talk.getLikeCnt() + 1);
-			talkRepository.save(talk);
-
-		} else {
-
-			// 프롬프트 - 사용자 좋아요 취소
-			TalkLike talkLike = talkLikeRepository
-				.findByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid))
-				.orElseThrow(TalkNotFoundException::new);
-			talkLikeRepository.delete(talkLike);
-
-			// 프롬프트 좋아요 개수 1 감소
-			talk.setLikeCnt(talk.getLikeCnt() - 1);
-			talkRepository.save(talk);
-		}
-
-	}
-
-    public Long findCommentCnt(Long talkId) {
-		return talkCommentRepository.countAllByTalk_Id(talkId);
+    // 은지가 짤거임, 지금 검색 안됨 그냥 전체 조회
+    public List<TalkListResponse> getTalkList(String crntMemberUuid) {
+        return getTalks(talkRepository.findAll());
     }
 
-	public int updateHit(Long talkId, HttpServletRequest request, HttpServletResponse response) {
+    // promptUuid가 있는지 없는지에 따라 -> 프롬프트 활용 or 그냥 대화
+    public TalkResponse createTalk(TalkRequest data) {
+        UUID userUuid = securityUtil.getCurrentMember().getUserUuid();
+        Talk talk = Talk.from(data, userUuid);
+        talkRepository.save(talk);
+        List<Message> messageList = data.getMessages().stream().map(message -> Message.from(message, talk)).collect(
+                Collectors.toList());
+        talk.setMessages(messageList);
+        if (data.getPromptUuid() != null) {
+            talk.setPrompt(promptRepository
+                    .findByPromptUuidAndStatusCode(UUID.fromString(data.getPromptUuid()), StatusCode.OPEN)
+                    .orElseThrow(PromptNotFoundException::new));
+        }
 
-		Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
+        return talk.toTalkResponse();
+    }
 
-		Cookie[] cookies = request.getCookies();
-		boolean checkCookie = false;
-		int result = 0;
-		if(cookies != null){
-			for (Cookie cookie : cookies) {
-				// 이미 조회를 한 경우 체크
-				if (cookie.getName().equals(VIEWCOOKIENAME+talkId)) checkCookie = true;
+    public TalkDetailResponse getTalkDetail(Long talkId, Pageable pageable) {
+        Member currentMember = securityUtil.getCurrentMember();
+        String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
+        Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
 
-			}
-			if(!checkCookie){
-				Cookie newCookie = createCookieForForNotOverlap(talkId);
-				response.addCookie(newCookie);
-				result = talkRepository.updateHit(talkId);
-			}
-		} else {
-			Cookie newCookie = createCookieForForNotOverlap(talkId);
-			response.addCookie(newCookie);
-			result = talkRepository.updateHit(talkId);
-		}
+        Long likeCnt = talkLikeRepository.countAllByTalkId(talkId);
+        boolean isLiked;
 
-		return result;
-	}
+        if (crntMemberUuid == null) {
+            isLiked = false;
+        } else {
+            isLiked = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid));
+        }
 
-	/*
-	 * 조회수 중복 방지를 위한 쿠키 생성 메소드
-	 * @param cookie
-	 * @return
-	 * */
-	private Cookie createCookieForForNotOverlap(Long talkId) {
-		Cookie cookie = new Cookie(VIEWCOOKIENAME+talkId, String.valueOf(talkId));
-		cookie.setComment("조회수 중복 증가 방지 쿠키");    // 쿠키 용도 설명 기재
-		cookie.setMaxAge(getRemainSecondForTomorrow());     // 하루를 준다.
-		cookie.setHttpOnly(true);                // 서버에서만 조작 가능
-		return cookie;
-	}
+        MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
 
-	// 다음 날 정각까지 남은 시간(초)
-	private int getRemainSecondForTomorrow() {
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime tomorrow = LocalDateTime.now().plusDays(1L).truncatedTo(ChronoUnit.DAYS);
-		return (int) now.until(tomorrow, ChronoUnit.SECONDS);
-	}
+        TalkDetailResponse response = talk.toDetailResponse(isLiked, likeCnt, memberResponse);
+
+        if (talk.getPrompt() != null) {
+            Prompt originPrompt = talk.getPrompt();
+
+            MemberResponse originMember = getMemberInfo(originPrompt.getMemberUuid());
+
+            PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid.toString(), originPrompt, originMember);
+
+            List<TalkListResponse> talkListResponses = getTalkListResponses(originPrompt, pageable);
+
+            response.setOriginMember(originMember);
+            response.setOriginPrompt(promptCardResponse);
+            response.setTalkList(talkListResponses);
+        }
+        return response;
+
+    }
+
+    private PromptCardResponse getPromptCardResponse(String crntMemberUuid, Prompt originPrompt, MemberResponse originMember) {
+        long commentCnt = promptCommentRepository.countAllByPromptPromptUuid(originPrompt.getPromptUuid());
+        long forkCnt = promptRepository.countAllByOriginPromptUuidAndStatusCode(originPrompt.getPromptUuid(), StatusCode.OPEN);
+        long talkCnt = talkRepository.countAllByPromptPromptUuid(originPrompt.getPromptUuid());
+
+        // 좋아요, 북마크 여부
+        boolean isOriginLiked;
+        boolean isBookmarked;
+
+        // 현재 로그인된 사용자가 아니면 기본값 false
+        if (crntMemberUuid == null) {
+            isBookmarked = false;
+            isOriginLiked = false;
+        } else {
+            isBookmarked = promptBookmarkRepository.findByMemberUuidAndPrompt(UUID.fromString(crntMemberUuid), originPrompt).isPresent();
+            isOriginLiked = promptLikeRepository.findByPromptAndMemberUuid(originPrompt, UUID.fromString(crntMemberUuid)).isPresent();
+        }
+
+        PromptCardResponse promptCardResponse = PromptCardResponse
+                .from(originMember, originPrompt, commentCnt, forkCnt, talkCnt, isBookmarked, isOriginLiked);
+        return promptCardResponse;
+    }
+
+    public List<TalkListResponse> getTalkListResponses(Prompt originPrompt, Pageable pageable) {
+
+        List<Talk> talks = talkRepository.findAllByPromptPromptUuid(originPrompt.getPromptUuid(), pageable).toList();
+
+        List<TalkListResponse> talkListResponses = getTalks(talks);
+
+        return talkListResponses;
+    }
+
+    public List<TalkListResponse> getTalks(List<Talk> talks) {
+        List<TalkListResponse> talkListResponses = talks.stream().map(talk -> {
+            Member currentMember = securityUtil.getCurrentMember();
+            String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
+
+            boolean isTalkLiked;
+
+            if (crntMemberUuid == null) {
+                isTalkLiked = false;
+            } else {
+                isTalkLiked = talkLikeRepository
+                        .findByTalk_IdAndMemberUuid(talk.getId(), UUID.fromString(crntMemberUuid)).isPresent();
+            }
+            Long talkLikeCnt = talkLikeRepository.countAllByTalkId(talk.getId());
+            Long talkCommentCnt = talkCommentRepository.countAllByTalk_Id(talk.getId());
+            String question = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.USER).getContent().toString();
+            String answer = messageRepository.findFirstByTalkIdAndRole(talk.getId(), Role.ASSISTANT).getContent().toString();
+            MemberResponse memberResponse = getMemberInfo(talk.getMemberUuid());
+
+            return talk.from(
+                    question,
+                    answer,
+                    memberResponse,
+                    talkLikeCnt,
+                    talkCommentCnt,
+                    isTalkLiked);
+
+        }).collect(Collectors.toList());
+        return talkListResponses;
+    }
+
+    public void removeTalk(Long talkId) {
+        UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
+        Talk talk = talkRepository.findById(talkId)
+                .orElseThrow(TalkNotFoundException::new);
+
+        if (!crntMemberUuid.equals(talk.getMemberUuid())) {
+            throw new ForbiddenMemberException();
+        }
+
+        talkRepository.delete(talk);
+    }
+
+    public void likeTalk(Long talkId) {
+
+        Member currentMember = securityUtil.getCurrentMember();
+        String crntMemberUuid = (currentMember != null) ? currentMember.getUserUuid().toString() : null;
+
+        // 좋아요 상태
+        Boolean talkLikeExist = talkLikeRepository.existsByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid));
+
+        Talk talk = talkRepository.findById(talkId)
+                .orElseThrow(TalkNotFoundException::new);
+
+        if (!talkLikeExist) {
+            // 톡 좋아요 조회
+            TalkLike talkLike = TalkLike.builder()
+                    .talk(talk)
+                    .memberUuid(UUID.fromString(crntMemberUuid))
+                    .regDt(LocalDateTime.now()).build();
+
+            // 톡 - 사용자 좋아요 관계 생성
+            talkLikeRepository.save(talkLike);
+
+            // 프롬프트 좋아요 개수 1 증가
+            talk.setLikeCnt(talk.getLikeCnt() + 1);
+            talkRepository.save(talk);
+
+        } else {
+
+            // 프롬프트 - 사용자 좋아요 취소
+            TalkLike talkLike = talkLikeRepository
+                    .findByTalk_IdAndMemberUuid(talkId, UUID.fromString(crntMemberUuid))
+                    .orElseThrow(TalkNotFoundException::new);
+            talkLikeRepository.delete(talkLike);
+
+            // 프롬프트 좋아요 개수 1 감소
+            talk.setLikeCnt(talk.getLikeCnt() - 1);
+            talkRepository.save(talk);
+        }
+
+    }
+
+    public Long findCommentCnt(Long talkId) {
+        return talkCommentRepository.countAllByTalk_Id(talkId);
+    }
+
+    public int updateHit(Long talkId, HttpServletRequest request, HttpServletResponse response) {
+
+        Talk talk = talkRepository.findById(talkId).orElseThrow(TalkNotFoundException::new);
+
+        Cookie[] cookies = request.getCookies();
+        boolean checkCookie = false;
+        int result = 0;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                // 이미 조회를 한 경우 체크
+                if (cookie.getName().equals(VIEWCOOKIENAME + talkId)) checkCookie = true;
+
+            }
+            if (!checkCookie) {
+                Cookie newCookie = createCookieForForNotOverlap(talkId);
+                response.addCookie(newCookie);
+                result = talkRepository.updateHit(talkId);
+            }
+        } else {
+            Cookie newCookie = createCookieForForNotOverlap(talkId);
+            response.addCookie(newCookie);
+            result = talkRepository.updateHit(talkId);
+        }
+
+        return result;
+    }
+
+    /*
+     * 조회수 중복 방지를 위한 쿠키 생성 메소드
+     * @param cookie
+     * @return
+     * */
+    private Cookie createCookieForForNotOverlap(Long talkId) {
+        Cookie cookie = new Cookie(VIEWCOOKIENAME + talkId, String.valueOf(talkId));
+        cookie.setComment("조회수 중복 증가 방지 쿠키");    // 쿠키 용도 설명 기재
+        cookie.setMaxAge(getRemainSecondForTomorrow());     // 하루를 준다.
+        cookie.setHttpOnly(true);                // 서버에서만 조작 가능
+        return cookie;
+    }
+
+    // 다음 날 정각까지 남은 시간(초)
+    private int getRemainSecondForTomorrow() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1L).truncatedTo(ChronoUnit.DAYS);
+        return (int) now.until(tomorrow, ChronoUnit.SECONDS);
+    }
 
     public MemberTalkList findTalksByMemberUuid(
-		String crntMemberUuid, int page, int size, String sort
-	) {
-		Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
-		Pageable pageable = PageRequest.of(page, size, sortBy);
+            String crntMemberUuid, int page, int size, String sort
+    ) {
+        Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
+        Pageable pageable = PageRequest.of(page, size, sortBy);
 
 
-		Page<Talk> pagedTalk = talkRepository.findTalksByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
-		long totalTalksCnt = pagedTalk.getTotalElements();
-		int totalPageCnt = pagedTalk.getTotalPages();
+        Page<Talk> pagedTalk = talkRepository.findTalksByMemberUuid(UUID.fromString(crntMemberUuid), pageable);
+        long totalTalksCnt = pagedTalk.getTotalElements();
+        int totalPageCnt = pagedTalk.getTotalPages();
 
-		List<MemberTalk> memberTalkList = new ArrayList<>();
-		for (Talk talk : pagedTalk) {
-			Long talkId = talk.getId();
+        List<MemberTalk> memberTalkList = new ArrayList<>();
+        for (Talk talk : pagedTalk) {
+            Long talkId = talk.getId();
 
-			// MemberClient에 memberUuid로 요청
-			MemberResponse member = getMemberInfo(talk.getMemberUuid());
-			WriterResponse writer = member.toWriterResponse();
+            // MemberClient에 memberUuid로 요청
+            MemberResponse member = getMemberInfo(talk.getMemberUuid());
+            WriterResponse writer = member.toWriterResponse();
 
-			Long commentCnt = findCommentCnt(talkId);
+            Long commentCnt = findCommentCnt(talkId);
 
-			memberTalkList.add(MemberTalk.of(writer, talk, commentCnt));
-		}
-		return new MemberTalkList(totalTalksCnt, totalPageCnt, memberTalkList);
-	}
+            memberTalkList.add(MemberTalk.of(writer, talk, commentCnt));
+        }
+        return new MemberTalkList(totalTalksCnt, totalPageCnt, memberTalkList);
+    }
 
-	private MemberResponse getMemberInfo(UUID memberUuid) {
+    private MemberResponse getMemberInfo(UUID memberUuid) {
 
-		log.info("DB로 회원 조회 중");
-		log.info("userUuid = " + memberUuid);
-		Member member = memberRepository.findByUserUuid(memberUuid);
-		log.info("member = " + member);
+        log.info("DB로 회원 조회 중");
+        log.info("userUuid = " + memberUuid);
+        Member member = memberRepository.findByUserUuid(memberUuid);
+        log.info("member = " + member);
 
-		MemberResponse memberResponse = (null == member)
-				? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
-				: MemberResponse.from(member);
-		return memberResponse;
-	}
+        MemberResponse memberResponse = (null == member)
+                ? new MemberResponse("알 수 없음", "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noProfile.png")
+                : MemberResponse.from(member);
+        return memberResponse;
+    }
+
+    public SearchTalkList searchTalks(String crntMemberUuid, String keyword, int page, int size, String sort) {
+        final Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
+        final Pageable pageable = PageRequest.of(page, size, sortBy);
+
+        final Page<Talk> pagedEsTalk = search(keyword, pageable);
+        final long totalTalksCnt = pagedEsTalk.getTotalElements();
+        final int totalPageCnt = pagedEsTalk.getTotalPages();
+
+        final List<SearchTalk> searchTalks = new ArrayList<>();
+        for (Talk talk : pagedEsTalk) {
+            final Long talkId = talk.getId();
+
+            // 사용자 조회
+            final MemberResponse member = getMemberInfo(talk.getMemberUuid());
+            final WriterResponse writer = member.toWriterResponse();
+
+            // PromptClient에 commentCnt 요청
+            final Long commentCnt = findCommentCnt(talkId);
+
+            searchTalks.add(SearchTalk.of(writer, talk, commentCnt));
+        }
+        return SearchTalkList.of(totalTalksCnt, totalPageCnt, searchTalks);
+    }
+
+    private Page<Talk> search(
+            String keyword,
+            Pageable pageable
+    ) {
+        Page<Talk> pagedEsTalk;
+        keyword = (keyword.equals("")) ? null : keyword;
+
+        if (null != keyword) {
+            pagedEsTalk = talkRepository
+                    .findByKeywordOnly(keyword, pageable);
+
+        } else {
+            pagedEsTalk = talkRepository
+                    .findAll(pageable);
+        }
+        return pagedEsTalk;
+    }
 }

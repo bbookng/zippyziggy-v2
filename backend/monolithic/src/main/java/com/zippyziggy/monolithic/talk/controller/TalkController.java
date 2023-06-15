@@ -27,9 +27,21 @@ public class TalkController {
 	private final TalkService talkService;
 	private final TalkCommentService talkCommentService;
 
-	@GetMapping("")
-	public ResponseEntity<List<TalkListResponse>> getTalkList(@RequestHeader String crntMemberuuid) {
-		return ResponseEntity.ok(talkService.getTalkList(crntMemberuuid));
+	@Operation(summary = "톡 목록 조회 및 검색", description = "톡 전체 목록을 조회하거나 검색한다.")
+	@GetMapping
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "성공"),
+			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
+			@ApiResponse(responseCode = "500", description = "서버 에러")
+	})
+	public ResponseEntity<SearchTalkList> getTalkList(
+			@RequestHeader(required = false) String crntMemberUuid,
+			@RequestParam(required = false, defaultValue = "") String keyword,
+			@RequestParam(required = false, defaultValue = "0") int page,
+			@RequestParam(required = false, defaultValue = "10") int size,
+			@RequestParam(required = false, defaultValue = "likeCnt") String sort
+	) {
+		return ResponseEntity.ok(talkService.searchTalks(crntMemberUuid, keyword, page, size, sort));
 	}
 
 	@Operation(summary = "톡 생성", description = "새로운 톡을 생성한다.")
