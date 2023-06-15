@@ -13,6 +13,7 @@ import com.zippyziggy.monolithic.member.repository.VisitedMemberCountRepository;
 import com.zippyziggy.monolithic.member.service.*;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardListResponse;
 import com.zippyziggy.monolithic.prompt.dto.response.PromptCardResponse;
+import com.zippyziggy.monolithic.prompt.dto.response.PromptCardListExtensionResponse;
 import com.zippyziggy.monolithic.prompt.service.PromptService;
 import com.zippyziggy.monolithic.talk.dto.response.MemberTalkList;
 import com.zippyziggy.monolithic.talk.service.TalkService;
@@ -291,12 +292,12 @@ public class MemberController {
             @PathVariable String crntMemberUuid,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, defaultValue = "likeCnt") String sort
+            @RequestParam(required = false, defaultValue = "regDt") String sort
     ) {
         final Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
         final Pageable pageable = PageRequest.of(page, size, sortBy);
 
-        com.zippyziggy.monolithic.prompt.dto.response.PromptCardListExtensionResponse promptCardListExtensionResponse =
+        PromptCardListExtensionResponse promptCardListExtensionResponse =
                 promptService.bookmarkPromptByMemberAndExtension(crntMemberUuid, pageable);
         return ResponseEntity.ok(promptCardListExtensionResponse);
     }
