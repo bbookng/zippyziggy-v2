@@ -719,7 +719,7 @@ public class PromptService{
 
 		} else if (null == keyword & null != enumCategory) {
 			pagedEsPrompt = promptRepository
-					.findByCategory(enumCategory, pageable);
+					.findByCategoryAndStatusCode(enumCategory, StatusCode.OPEN, pageable);
 
 		} else if (null != keyword & null == enumCategory) {
 			pagedEsPrompt = promptRepository
@@ -727,7 +727,7 @@ public class PromptService{
 
 		} else if (null == keyword & null == enumCategory) {
 			pagedEsPrompt = promptRepository
-					.findAll(pageable);
+					.findAllByStatusCode(StatusCode.OPEN, pageable);
 		}
 
 		return pagedEsPrompt;

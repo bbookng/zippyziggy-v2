@@ -33,13 +33,15 @@ public interface PromptRepository extends JpaRepository<Prompt, Long> {
 
 	@Query(	"select p " +
 			"from Prompt p " +
-			"where (p.title like %:keyword% or p.description like %:keyword% or p.prefix like %:keyword% or p.suffix like %:keyword% or p.example like %:keyword%) and (p.category = :category)")
+			"where p.statusCode=1 and ((p.title like %:keyword% or p.description like %:keyword% or p.prefix like %:keyword% or p.suffix like %:keyword% or p.example like %:keyword%) and (p.category = :category))")
     Page<Prompt> findByKeywordAndCategory(String keyword, Category category, Pageable pageable);
 
-	Page<Prompt> findByCategory(Category category, Pageable pageable);
+	Page<Prompt> findByCategoryAndStatusCode(Category category, StatusCode statusCode, Pageable pageable);
 
 	@Query( "select p " +
 			"from Prompt p " +
-			"where p.title like %:keyword% or p.description like %:keyword% or p.prefix like %:keyword% or p.suffix like %:keyword% or p.example like %:keyword%")
+			"where p.statusCode=1 and (p.title like %:keyword% or p.description like %:keyword% or p.prefix like %:keyword% or p.suffix like %:keyword% or p.example like %:keyword%)")
 	Page<Prompt> findByKeywordOnly(String keyword, Pageable pageable);
+
+	Page<Prompt> findAllByStatusCode(StatusCode statusCode, Pageable pageable);
 }
