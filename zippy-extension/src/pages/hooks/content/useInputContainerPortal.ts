@@ -59,7 +59,7 @@ const useInputContainerPortal = () => {
       const isInputWrapper = className?.includes(
         'flex ml-1 md:w-full md:m-auto md:mb-2 gap-0 md:gap-2 justify-center'
       );
-      const isChange = className.includes('relative flex h-full max-w-full flex-1 overflow-hidden');
+      const isChange = className.includes('relative flex h-full flex-1 items-stretch md:flex-col');
 
       return Boolean(isPromptContainer || isRoot || isInputWrapper || isChange);
     };

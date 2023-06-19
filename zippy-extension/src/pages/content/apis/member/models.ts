@@ -1,6 +1,6 @@
 /* 소셜버튼 최초 클릭 타입들 시작 */
 
-import { ExtensionSearchResult, Prompt } from '@pages/content/apis/search/models';
+import { ExtensionSearchResult, Prompt } from '@pages/content/apis/prompt/models';
 
 export interface CheckAuthParams {
   code: string;

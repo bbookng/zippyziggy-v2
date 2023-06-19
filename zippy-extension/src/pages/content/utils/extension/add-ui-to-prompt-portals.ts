@@ -64,6 +64,9 @@ export const shouldCreatePromptContainerPortal = (
     targetElement.className === 'flex flex-col text-sm dark:bg-gray-800' ||
     targetElement.className.includes('relative flex h-full max-w-full flex-1') ||
     (isNewChatPage && targetElement.className === 'overflow-hidden w-full h-full relative flex') ||
+    (isNewChatPage &&
+      targetElement.className ===
+        'relative h-full w-full transition-width flex flex-col overflow-auto items-stretch flex-1') ||
     (isNewChatPage && targetElement.className.includes('react-scroll-to-bottom--css')) ||
     targetElement.id === '__next'
   );

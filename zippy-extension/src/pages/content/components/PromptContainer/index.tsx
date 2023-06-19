@@ -21,9 +21,9 @@ import UserInfo from '@pages/content/components/PromptContainer/UserInfo';
 import { useQuery } from '@tanstack/react-query';
 import { SignUpResult } from '@pages/content/apis/member/models';
 import { getBookmarkList } from '@pages/content/apis/member';
-import { searchPrompts } from '@pages/content/apis/search';
 import Skeleton from '@pages/content/components/PromptContainer/PromptCard/Skeleton';
 import t from '@src/chrome/i18n';
+import { searchPrompts } from '@pages/content/apis/prompt';
 
 export const category: Array<Category> = [
   { id: 'all', text: t('filterCategory_all'), value: 'ALL' },
@@ -125,7 +125,7 @@ const PromptContainer = () => {
       const params = {
         page: searchPage[selectedCategory] - 1,
         size: limit,
-        sort: selectedSort,
+        sort: 'regDt',
       };
       return getBookmarkList(path, params);
     },

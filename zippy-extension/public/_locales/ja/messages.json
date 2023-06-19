@@ -201,7 +201,7 @@
     "message": "会話の共有に失敗しました。"
   },
   "errorMessage_serverError": {
-    "message": "ZippyZiggyのサーバーは現在更新中です。サービスは6月初旬に再開されます。"
+    "message": "server error"
   },
   "errorMessage_noContent": {
     "message": "結果がありません。"

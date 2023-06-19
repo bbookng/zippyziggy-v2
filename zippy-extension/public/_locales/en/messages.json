@@ -201,7 +201,7 @@
     "message": "Failed to share the conversation."
   },
   "errorMessage_serverError": {
-    "message": "The ZippyZiggy server is currently undergoing renewal. The service will resume in early June."
+    "message": "server error"
   },
   "errorMessage_noContent": {
     "message": "No results found."

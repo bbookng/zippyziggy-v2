@@ -8,9 +8,9 @@ import {
 } from '@pages/constants';
 import { formatAgo, formatDateTime, formatHumanReadableNumber } from '@src/utils';
 import { category } from '@pages/content/components/PromptContainer';
-import { Prompt } from '@pages/content/apis/search/models';
 import ActionButton from '@pages/content/components/PromptContainer/PromptCard/ActionButton';
 import t from '@src/chrome/i18n';
+import { Prompt } from '@pages/content/apis/prompt/models';
 
 interface PromptCardProps {
   name: string;
@@ -123,7 +123,7 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
             </h3>
             <p className="ZP_prompt-container__category caption">
               {`${t('filterCategory')} / ${
-                category.find((item) => item.value === promptCategory).text ?? ''
+                category.find((item) => item.value === promptCategory)?.text ?? ''
               }`}
             </p>
             <p className="ZP_prompt-container__description" title={description} translate="yes">
