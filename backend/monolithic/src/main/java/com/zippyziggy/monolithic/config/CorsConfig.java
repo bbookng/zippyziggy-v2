@@ -19,8 +19,6 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true); // 내 서버가 응답할 때 json을 자바스크립트에서 처리할 수 있게할지를 설정하는 것
-        config.addAllowedOrigin("http://k8e205.p.ssafy.io:8000");
-        config.addAllowedOrigin("http://k8e205.p.ssafy.io:3000");
         config.addAllowedOrigin("http://zippyziggy.kr:3000");
         config.addAllowedOrigin("http://zippyziggy.kr");
         config.addAllowedOrigin("https://zippyziggy.kr");
