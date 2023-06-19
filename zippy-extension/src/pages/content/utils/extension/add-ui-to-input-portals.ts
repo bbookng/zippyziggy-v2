@@ -12,6 +12,7 @@ import logo from '@assets/img/icon16.png';
 import { findRegenerateButton } from '@pages/content/utils/extension/add-ui-to-prompt-portals';
 import { authApi } from '@pages/content/utils/apis/axios-instance';
 import throttle from '@pages/content/utils/@shared/throttle';
+import t from '@src/chrome/i18n';
 
 export const removeFormParentClasses = (formParent) => {
   const $formParent = formParent;
@@ -103,14 +104,14 @@ export const setInputWrapperStyle = (parent) => {
   const $parent = parent;
   $parent.style.paddingTop = 0;
   $parent.style.paddingRight = '1rem';
-  $parent.style.border = '1px solid #10C600';
+  $parent.classList.add('ZP_inputFocus');
 
   const handleFocus = () => {
-    $parent.style.border = '1px solid #10C600';
+    $parent.classList.add('ZP_inputFocus');
   };
 
   const handleBlur = () => {
-    $parent.style.border = '1px solid transparent';
+    $parent.classList.remove('ZP_inputFocus');
   };
 
   document.querySelector('textarea')?.addEventListener('focus', handleFocus);
@@ -129,11 +130,14 @@ export const adjustToBottomButtonPosition = (targetElement: HTMLElement) => {
 
 export const createShareButton = () => {
   if (document.getElementById(ZP_SHARE_BUTTON_ID)) return null;
+
   const $shareButton = document.createElement('button');
   $shareButton.id = ZP_SHARE_BUTTON_ID;
   $shareButton.classList.add('btn', 'relative', 'btn-neutral', 'border-0', 'md:border', 'mr-1');
+
   const $shareButtonContent = document.createElement('div');
   $shareButtonContent.classList.add('flex', 'w-full', 'gap-2', 'items-center', 'justify-center');
+
   if (document.body.clientWidth >= 768) {
     $shareButtonContent.innerHTML = `
     <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -155,7 +159,7 @@ export const createShareButton = () => {
                   12.0973 20.875 11.9028 20.7463 11.8027L12.4034 5.31385Z"
                   fill="currentColor"/>
     </svg>
-                            대화내용 공유하기`;
+                            ${t('shareButton_default')} ${t('shareButton_ready')}`;
   } else {
     $shareButtonContent.innerHTML = `
     <svg width="1.2rem" height="1.2rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -242,7 +246,10 @@ const resetShareButton = (shareButton: HTMLElement) => {
                   fill="currentColor"/>
     </svg>`;
   } else {
-    $shareButton.innerHTML = $shareButton.innerHTML.replace(/공유 중.../g, '공유하기');
+    $shareButton.innerHTML = $shareButton.innerHTML.replace(
+      new RegExp(t('shareButton_loading'), 'g'),
+      t('shareButton_ready')
+    );
   }
 };
 
@@ -252,20 +259,22 @@ const isChatGptPlusUser = () => {
   return !isNotChatGptPlus;
 };
 const updateShareButtonState = ($shareButton) => {
-  // 이 부분은 복잡한 조건문을 분리하는데 사용됩니다.
   const isMobile = document.body.clientWidth < 768;
   if (isMobile) {
     $shareButton.children[0].textContent = '...';
     ($shareButton.children[0] as HTMLElement).style.width = '1.2rem';
   } else {
-    $shareButton.innerHTML = $shareButton.innerHTML.replace(/공유하기/g, '공유 중...');
+    $shareButton.innerHTML = $shareButton.innerHTML.replace(
+      new RegExp(t('shareButton_ready'), 'g'),
+      t('shareButton_loading')
+    );
   }
   $shareButton.style.cursor = 'initial';
 };
 
 const getConversationData = async (model) => {
   const $threadContainer = document.getElementsByClassName(
-    'flex flex-col items-center text-sm dark:bg-gray-800'
+    'flex flex-col text-sm dark:bg-gray-800'
   )[0] as HTMLElement;
 
   const isChatGptPlus = isChatGptPlusUser();
@@ -290,6 +299,26 @@ const getConversationData = async (model) => {
     messages: getMessagesFromThread($threadContainer),
   };
 };
+
+export const appendPromptLink = async () => {
+  // if (findRegenerateButton()) {
+  //   const $threadContainer = document.getElementsByClassName(
+  //     'flex flex-col text-sm dark:bg-gray-800'
+  //   )[0] as HTMLElement;
+  //
+  //   const isChatGptPlus = isChatGptPlusUser();
+  //   let $firstConversation = $threadContainer?.firstChild as HTMLElement;
+  //
+  //   if (isChatGptPlus) {
+  //     $firstConversation = ($threadContainer?.firstChild as HTMLElement)
+  //       ?.nextElementSibling as HTMLElement;
+  //   }
+  //
+  //   const $selectedPromptTitle = document.querySelector(
+  //     `#${ZP_PROMPT_TITLE_HOLDER_ID}`
+  //   ) as HTMLElement;
+  // }
+};
 const handleShareButtonClick = async ($shareButton) => {
   let isRequesting = false; // 공유 요청 state 관리
   const model = 'Model: Default (GPT-3.5)'; // GPT 모델
@@ -309,13 +338,15 @@ const handleShareButtonClick = async ($shareButton) => {
   if (!conversationData) return;
 
   try {
-    const {
-      data: { talkId },
-    } = await authApi.post('/talks', conversationData);
+    if (window.confirm(t('confirmMessage_conversationsShare'))) {
+      const {
+        data: { talkId },
+      } = await authApi.post('/talks', conversationData);
 
-    window.open(`${ZIPPY_SITE_URL}/talks/${talkId}`, '_blank');
+      window.open(`${ZIPPY_SITE_URL}/talks/${talkId}`, '_blank');
+    }
   } catch (err) {
-    alert('대화내용 공유에 실패했습니다.');
+    window.alert(t('errorMessage_conversationsShare'));
   } finally {
     isRequesting = false;
     resetShareButton($shareButton);
@@ -329,11 +360,13 @@ export const appendShareButton = async () => {
     const $shareButton = createShareButton();
     if (!$shareButton) return;
 
-    findRegenerateButton().insertAdjacentElement('beforebegin', $shareButton);
+    if (findRegenerateButton()) {
+      findRegenerateButton().insertAdjacentElement('beforebegin', $shareButton);
+    }
 
     $shareButton.addEventListener(
       'click',
-      throttle(() => handleShareButtonClick($shareButton), 3000)
+      throttle(() => handleShareButtonClick($shareButton), 2000)
     );
   });
 };

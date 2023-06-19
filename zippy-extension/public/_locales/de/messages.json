@@ -1,0 +1,215 @@
+{
+  "extensionName": {
+    "message": "ZippyZiggy - Teile und verwende ChatGPT-Prompts einfach!"
+  },
+  "extensionDescription": {
+    "message": "Wende vorgeschriebene Prompts mit einem einfachen Klick an, um mit ChatGPT zu chatten!"
+  },
+  "authButton": {
+    "message": "Registrieren"
+  },
+  "shareButton_default": {
+    "message": "Gesprächsinhalte"
+  },
+  "shareButton_ready": {
+    "message": "Aktie"
+  },
+  "shareButton_loading": {
+    "message": "Teilen..."
+  },
+  "signInModal_introduce": {
+    "message": "Probiere weitere Funktionen aus!"
+  },
+  "signUpModal_introduce": {
+    "message": "Vergebe einen Spitznamen und vervollständige deine Registrierung!"
+  },
+  "signUpModal_placeholder": {
+    "message": "Gib deinen Spitznamen ein."
+  },
+  "signUpModal_signUpButton": {
+    "message": "Registrieren"
+  },
+  "signUpModal_welcomePrefix": {
+    "message": "Willkommen,"
+  },
+  "signUpModal_welcomeSuffix": {
+    "message": "!"
+  },
+  "signUpModal_duplicateNicknameMessage": {
+    "message": "Dieser Spitzname ist bereits vergeben!"
+  },
+  "filterCategory" : {
+    "message": "Kategorie"
+  },
+  "filterCategory_all" : {
+    "message": "Alle"
+  },
+  "filterCategory_study" : {
+    "message": "Studium"
+  },
+  "filterCategory_fun" : {
+    "message": "Unterhaltung"
+  },
+  "filterCategory_business" : {
+    "message": "Geschäftlich"
+  },
+  "filterCategory_programming" : {
+    "message": "Entwicklung"
+  },
+  "filterCategory_etc" : {
+    "message": "Sonstiges"
+  },
+  "filterCategory_bookmark" : {
+    "message": "Lesezeichen"
+  },
+  "sortCategory_like" : {
+    "message": "Beliebtheit"
+  },
+  "sortCategory_mostView" : {
+    "message": "angesehen"
+  },
+  "sortCategory_latest" : {
+    "message": "Neueste"
+  },
+  "welcomeMessage_prefix": {
+    "message": "Willkommen!"
+  },
+  "welcomeMessage_suffix": {
+    "message": ""
+  },
+  "searchInput_placeholder": {
+    "message": "Gib Suchbegriffe ein."
+  },
+  "actionDropdown_continueText": {
+    "message": "fortsetzen"
+  },
+  "actionDropdown_rewriteText": {
+    "message": "Umschreiben"
+  },
+  "actionDropdown_exemplifyText": {
+    "message": "Beispiel"
+  },
+  "actionDropdown_clarifyText": {
+    "message": "Klärung"
+  },
+  "actionDropdown_expandText": {
+    "message": "Erweitern"
+  },
+  "actionDropdown_shortenText": {
+    "message": "Kürzen"
+  },
+  "actionDropdown_explainText": {
+    "message": "Erklären"
+  },
+  "actionDropdown_continueValue": {
+    "message": "Bitte fahre fort"
+  },
+  "actionDropdown_rewriteValue": {
+    "message": "Bitte schreibe es um"
+  },
+  "actionDropdown_exemplifyValue": {
+    "message": "Bitte gib ein Beispiel"
+  },
+  "actionDropdown_clarifyValue": {
+    "message": "Bitte kläre es"
+  },
+  "actionDropdown_expandValue": {
+    "message": "Bitte erweitere es"
+  },
+  "actionDropdown_shortenValue": {
+    "message": "Bitte kürze es"
+  },
+  "actionDropdown_explainValue": {
+    "message": "Bitte erkläre es"
+  },
+  "languageDropdown_search": {
+    "message": "Suche"
+  },
+  "languageDropdown_select": {
+    "message": "Sprachauswahl"
+  },
+  "languageDropdown_no": {
+    "message": "Nicht ausgewählt"
+  },
+  "languageDropdown_browser": {
+    "message": "Standard"
+  },
+  "languageDropdown_ko": {
+    "message": "Koreanisch"
+  },
+  "languageDropdown_en": {
+    "message": "Englisch"
+  },
+  "languageDropdown_ja": {
+    "message": "Japanisch"
+  },
+  "languageDropdown_zhTW": {
+    "message": "Traditionell"
+  },
+  "languageDropdown_zhCN": {
+    "message": "Vereinfacht"
+  },
+  "languageDropdown_ur": {
+    "message": "Urdu"
+  },
+  "languageDropdown_es": {
+    "message": "Spanisch"
+  },
+  "languageDropdown_fr": {
+    "message": "Französisch"
+  },
+  "languageDropdown_de": {
+    "message": "Deutsch"
+  },
+  "languageDropdown_ru": {
+    "message": "Russisch"
+  },
+  "languageDropdown_pt": {
+    "message": "Portugiesisch"
+  },
+  "languageDropdown_it": {
+    "message": "Italienisch"
+  },
+  "languageDropdown_vi": {
+    "message": "Vietnamesisch"
+  },
+  "languageDropdown_th": {
+    "message": "Thailändisch"
+  },
+  "languageDropdown_id": {
+    "message": "Indonesisch"
+  },
+  "popup_zippyziggyLink": {
+    "message": "Besuche die ZippyZiggy-Website"
+  },
+  "popup_GPTLink": {
+    "message": "Probiere es in ChatGPT aus"
+  },
+  "popup_cannyLink": {
+    "message": "Melde Fehler und fordere Funktionen an"
+  },
+  "popup_notionLink": {
+    "message": "Patch Notes"
+  },
+  "popup_version": {
+    "message": "Version"
+  },
+  "popup_buildTime": {
+    "message": "Build-Zeit"
+  },
+  "errorMessage_conversationsShare": {
+    "message": "Konversation konnte nicht geteilt werden."
+  },
+  "errorMessage_serverError": {
+    "message": "server error"
+  },
+  "errorMessage_noContent": {
+    "message": "Keine Ergebnisse gefunden."
+  },
+  "errorMessage_noAuthentication": {
+    "message": "Bitte melden Sie sich an, um diese Funktion zu nutzen."
+  },
+  "confirmMessage_conversationsShare": {
+    "message": "Möchten Sie den Dialog mit ZippyZiggy teilen?"
+  }
+}

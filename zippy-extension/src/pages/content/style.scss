@@ -106,13 +106,17 @@
   }
 }
 
+.ZP_inputFocus {
+  border: 1px solid var(--input-focus-color) !important;
+}
+
 // 필터
 .ZP_prompt-container__filter {
   ul {
     display: flex;
     justify-content: space-evenly;
     width: 100%;
-    max-width: 30rem;
+    max-width: fit-content;
     background-color: var(--background-color);
     border-radius: var(--borders-radius-base);
     overflow: hidden;

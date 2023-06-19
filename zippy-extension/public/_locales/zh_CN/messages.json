@@ -1,0 +1,215 @@
+{
+  "extensionName": {
+    "message": "ZippyZiggy - 分享并轻松使用ChatGPT提示!"
+  },
+  "extensionDescription": {
+    "message": "只需点击一下，就可以应用预写的提示与ChatGPT聊天!"
+  },
+  "authButton": {
+    "message": "账户链接"
+  },
+  "shareButton_default": {
+    "message": "对话内容"
+  },
+  "shareButton_ready": {
+    "message": "分享"
+  },
+  "shareButton_loading": {
+    "message": "正在分享..."
+  },
+  "signInModal_introduce": {
+    "message": "试试更多功能!"
+  },
+  "signUpModal_introduce": {
+    "message": "设置一个昵称并完成注册!"
+  },
+  "signUpModal_placeholder": {
+    "message": "输入你的昵称。"
+  },
+  "signUpModal_signUpButton": {
+    "message": "注册"
+  },
+  "signUpModal_welcomePrefix": {
+    "message": "欢迎，"
+  },
+  "signUpModal_welcomeSuffix": {
+    "message": "!"
+  },
+  "signUpModal_duplicateNicknameMessage": {
+    "message": "昵称已被占用!"
+  },
+  "filterCategory" : {
+    "message": "分类"
+  },
+  "filterCategory_all" : {
+    "message": "全部"
+  },
+  "filterCategory_study" : {
+    "message": "学习"
+  },
+  "filterCategory_fun" : {
+    "message": "娱乐"
+  },
+  "filterCategory_business" : {
+    "message": "商务"
+  },
+  "filterCategory_programming" : {
+    "message": "开发"
+  },
+  "filterCategory_etc" : {
+    "message": "其他"
+  },
+  "filterCategory_bookmark" : {
+    "message": "书签"
+  },
+  "sortCategory_like" : {
+    "message": "按热度"
+  },
+  "sortCategory_mostView" : {
+    "message": "最多浏览"
+  },
+  "sortCategory_latest" : {
+    "message": "最新"
+  },
+  "welcomeMessage_prefix": {
+    "message": "欢迎!"
+  },
+  "welcomeMessage_suffix": {
+    "message": ""
+  },
+  "searchInput_placeholder": {
+    "message": "输入搜索关键词。"
+  },
+  "actionDropdown_continueText": {
+    "message": "继续写"
+  },
+  "actionDropdown_rewriteText": {
+    "message": "重写"
+  },
+  "actionDropdown_exemplifyText": {
+    "message": "举例"
+  },
+  "actionDropdown_clarifyText": {
+    "message": "澄清"
+  },
+  "actionDropdown_expandText": {
+    "message": "扩展"
+  },
+  "actionDropdown_shortenText": {
+    "message": "缩短"
+  },
+  "actionDropdown_explainText": {
+    "message": "解释"
+  },
+  "actionDropdown_continueValue": {
+    "message": "请继续回答"
+  },
+  "actionDropdown_rewriteValue": {
+    "message": "请重新回答"
+  },
+  "actionDropdown_exemplifyValue": {
+    "message": "可以给出示例吗？"
+  },
+  "actionDropdown_clarifyValue": {
+    "message": "请更清楚地回答"
+  },
+  "actionDropdown_expandValue": {
+    "message": "请详细回答"
+  },
+  "actionDropdown_shortenValue": {
+    "message": "请总结您的回答"
+  },
+  "actionDropdown_explainValue": {
+    "message": "请解释您的回答"
+  },
+  "languageDropdown_search": {
+    "message": "搜索"
+  },
+  "languageDropdown_select": {
+    "message": "语言选择"
+  },
+  "languageDropdown_no": {
+    "message": "未设置"
+  },
+  "languageDropdown_browser": {
+    "message": "检测语言"
+  },
+  "languageDropdown_ko": {
+    "message": "韩语"
+  },
+  "languageDropdown_en": {
+    "message": "英语"
+  },
+  "languageDropdown_ja": {
+    "message": "日语"
+  },
+  "languageDropdown_zhTW": {
+    "message": "繁体"
+  },
+  "languageDropdown_zhCN": {
+    "message": "简体"
+  },
+  "languageDropdown_ur": {
+    "message": "乌尔都语"
+  },
+  "languageDropdown_es": {
+    "message": "西班牙语"
+  },
+  "languageDropdown_fr": {
+    "message": "法语"
+  },
+  "languageDropdown_de": {
+    "message": "德语"
+  },
+  "languageDropdown_ru": {
+    "message": "俄语"
+  },
+  "languageDropdown_pt": {
+    "message": "葡萄牙语"
+  },
+  "languageDropdown_it": {
+    "message": "意大利语"
+  },
+  "languageDropdown_vi": {
+    "message": "越南语"
+  },
+  "languageDropdown_th": {
+    "message": "泰语"
+  },
+  "languageDropdown_id": {
+    "message": "印尼语"
+  },
+  "popup_zippyziggyLink": {
+    "message": "访问网站"
+  },
+  "popup_GPTLink": {
+    "message": "试用ChatGPT"
+  },
+  "popup_cannyLink": {
+    "message": "报告错误和请求功能"
+  },
+  "popup_notionLink": {
+    "message": "补丁说明"
+  },
+  "popup_version": {
+    "message": "版本"
+  },
+  "popup_buildTime": {
+    "message": "构建时间"
+  },
+  "errorMessage_conversationsShare": {
+    "message": "对话内容分享失败。"
+  },
+  "errorMessage_serverError": {
+    "message": "server error"
+  },
+  "errorMessage_noContent": {
+    "message": "没有结果。"
+  },
+  "errorMessage_noAuthentication": {
+    "message": "请登录后使用此功能。"
+  },
+  "confirmMessage_conversationsShare": {
+    "message": "确认要将对话内容分享给ZippyZiggy吗？"
+  }
+}

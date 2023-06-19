@@ -61,9 +61,12 @@ export const shouldCreatePromptContainerPortal = (
   const isNewChatPage = isNewChatPageRef.current;
 
   return (
-    targetElement.className === 'flex flex-col items-center text-sm dark:bg-gray-800' ||
+    targetElement.className === 'flex flex-col text-sm dark:bg-gray-800' ||
     targetElement.className.includes('relative flex h-full max-w-full flex-1') ||
     (isNewChatPage && targetElement.className === 'overflow-hidden w-full h-full relative flex') ||
+    (isNewChatPage &&
+      targetElement.className ===
+        'relative h-full w-full transition-width flex flex-col overflow-auto items-stretch flex-1') ||
     (isNewChatPage && targetElement.className.includes('react-scroll-to-bottom--css')) ||
     targetElement.id === '__next'
   );
@@ -78,7 +81,7 @@ export const hideEmptyDiv = (targetElement: Element) => {
       'h-full flex ml-1 md:w-full md:m-auto md:mb-2 gap-0 md:gap-2 justify-center'
   ) {
     const $unlessElement = document.querySelector(
-      'div.w-full.h-32.md\\:h-48.flex-shrink-0'
+      'div.h-32.md\\:h-48.flex-shrink-0'
     ) as HTMLDivElement;
     if ($unlessElement) {
       $unlessElement.style.display = 'none';

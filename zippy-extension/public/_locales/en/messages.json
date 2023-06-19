@@ -1,0 +1,215 @@
+{
+  "extensionName": {
+    "message": "ZippyZiggy - Share and easily use ChatGPT prompts!"
+  },
+  "extensionDescription": {
+    "message": "Apply pre-written prompts with a simple click to chat with ChatGPT!"
+  },
+  "authButton": {
+    "message": "Join/Sign up"
+  },
+  "shareButton_default": {
+    "message": "Conversation"
+  },
+  "shareButton_ready": {
+    "message": "Share"
+  },
+  "shareButton_loading": {
+    "message": "Sharing..."
+  },
+  "signInModal_introduce": {
+    "message": "Try out more features!"
+  },
+  "signUpModal_introduce": {
+    "message": "Set a nickname and complete your registration!"
+  },
+  "signUpModal_placeholder": {
+    "message": "Enter your nickname."
+  },
+  "signUpModal_signUpButton": {
+    "message": "Sign Up"
+  },
+  "signUpModal_welcomePrefix": {
+    "message": "Welcome,"
+  },
+  "signUpModal_welcomeSuffix": {
+    "message": "!"
+  },
+  "signUpModal_duplicateNicknameMessage": {
+    "message": "This nickname is already taken!"
+  },
+  "filterCategory" : {
+    "message": "Category"
+  },
+  "filterCategory_all" : {
+    "message": "All"
+  },
+  "filterCategory_study" : {
+    "message": "Study"
+  },
+  "filterCategory_fun" : {
+    "message": "Fun"
+  },
+  "filterCategory_business" : {
+    "message": "Business"
+  },
+  "filterCategory_programming" : {
+    "message": "Dev"
+  },
+  "filterCategory_etc" : {
+    "message": "Etc"
+  },
+  "filterCategory_bookmark" : {
+    "message": "Bookmark"
+  },
+  "sortCategory_like" : {
+    "message": "Likes"
+  },
+  "sortCategory_mostView" : {
+    "message": "Most Views"
+  },
+  "sortCategory_latest" : {
+    "message": "Latest"
+  },
+  "welcomeMessage_prefix": {
+    "message": "Welcome!"
+  },
+  "welcomeMessage_suffix": {
+    "message": ""
+  },
+  "searchInput_placeholder": {
+    "message": "Enter search keywords."
+  },
+  "actionDropdown_continueText": {
+    "message": "Continue"
+  },
+  "actionDropdown_rewriteText": {
+    "message": "Rewrite"
+  },
+  "actionDropdown_exemplifyText": {
+    "message": "Exemplify"
+  },
+  "actionDropdown_clarifyText": {
+    "message": "Clarify"
+  },
+  "actionDropdown_expandText": {
+    "message": "Expand"
+  },
+  "actionDropdown_shortenText": {
+    "message": "Shorten"
+  },
+  "actionDropdown_explainText": {
+    "message": "Explain"
+  },
+  "actionDropdown_continueValue": {
+    "message": "Please continue it"
+  },
+  "actionDropdown_rewriteValue": {
+    "message": "Please rewrite it"
+  },
+  "actionDropdown_exemplifyValue": {
+    "message": "Please exemplify it"
+  },
+  "actionDropdown_clarifyValue": {
+    "message": "Please clarify it"
+  },
+  "actionDropdown_expandValue": {
+    "message": "Please expand it"
+  },
+  "actionDropdown_shortenValue": {
+    "message": "Please shorten it"
+  },
+  "actionDropdown_explainValue": {
+    "message": "Please explain it"
+  },
+  "languageDropdown_search": {
+    "message": "Search"
+  },
+  "languageDropdown_select": {
+    "message": "Language"
+  },
+  "languageDropdown_no": {
+    "message": "No set"
+  },
+  "languageDropdown_browser": {
+    "message": "Default"
+  },
+  "languageDropdown_ko": {
+    "message": "Korean"
+  },
+  "languageDropdown_en": {
+    "message": "English"
+  },
+  "languageDropdown_ja": {
+    "message": "Japanese"
+  },
+  "languageDropdown_zhTW": {
+    "message": "Traditional"
+  },
+  "languageDropdown_zhCN": {
+    "message": "Simplified"
+  },
+  "languageDropdown_ur": {
+    "message": "Urdu"
+  },
+  "languageDropdown_es": {
+    "message": "Spanish"
+  },
+  "languageDropdown_fr": {
+    "message": "French"
+  },
+  "languageDropdown_de": {
+    "message": "German"
+  },
+  "languageDropdown_ru": {
+    "message": "Russian"
+  },
+  "languageDropdown_pt": {
+    "message": "Portuguese"
+  },
+  "languageDropdown_it": {
+    "message": "Italian"
+  },
+  "languageDropdown_vi": {
+    "message": "Vietnamese"
+  },
+  "languageDropdown_th": {
+    "message": "Thai"
+  },
+  "languageDropdown_id": {
+    "message": "Indonesian"
+  },
+  "popup_zippyziggyLink": {
+    "message": "Visit ZippyZiggy Website"
+  },
+  "popup_GPTLink": {
+    "message": "Try in ChatGPT"
+  },
+  "popup_cannyLink": {
+    "message": "Report bugs and request features"
+  },
+  "popup_notionLink": {
+    "message": "Patch Notes"
+  },
+  "popup_version": {
+    "message": "version"
+  },
+  "popup_buildTime": {
+    "message": "build time"
+  },
+  "errorMessage_conversationsShare": {
+    "message": "Failed to share the conversation."
+  },
+  "errorMessage_serverError": {
+    "message": "server error"
+  },
+  "errorMessage_noContent": {
+    "message": "No results found."
+  },
+  "errorMessage_noAuthentication": {
+    "message": "Please log in to use this feature."
+  },
+  "confirmMessage_conversationsShare": {
+    "message": "Do you want to share the conversation with ZippyZiggy?"
+  }
+}

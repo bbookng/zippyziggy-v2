@@ -8,8 +8,9 @@ import {
 } from '@pages/constants';
 import { formatAgo, formatDateTime, formatHumanReadableNumber } from '@src/utils';
 import { category } from '@pages/content/components/PromptContainer';
-import { Prompt } from '@pages/content/apis/search/models';
 import ActionButton from '@pages/content/components/PromptContainer/PromptCard/ActionButton';
+import t from '@src/chrome/i18n';
+import { Prompt } from '@pages/content/apis/prompt/models';
 
 interface PromptCardProps {
   name: string;
@@ -49,14 +50,14 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
     const message = {
       type: 'selectPrompt',
       data: {
-        prompt: `${ZIPPY_SITE_URL}/prompts/${promptUuid}\n${prefix || ''} ${PROMPT_PLACEHOLDER} ${
-          suffix || ''
-        }${TARGET_LANGUAGE_PLACEHOLDER}`.trim(),
+        prompt: `${ZIPPY_SITE_URL}/prompts/${promptUuid}\n위의 링크는 무시하세요.\n\n${
+          prefix || ''
+        } ${PROMPT_PLACEHOLDER} ${suffix || ''}${TARGET_LANGUAGE_PLACEHOLDER}`.trim(),
       },
     };
 
     const $textarea = document.querySelector(`form textarea`) as HTMLTextAreaElement;
-    $textarea.placeholder = `예시) ${example}`;
+    $textarea.placeholder = `ex) ${example}`;
     $textarea.style.overflowY = 'visible';
     $textarea.style.height = 'fit-content';
 
@@ -117,13 +118,15 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
             />
           </div>
           <div className="ZP_prompt-container__content-wrapper">
-            <h3 className="ZP_prompt-container__title" title={title}>
+            <h3 className="ZP_prompt-container__title" title={title} translate="yes">
               {title}
             </h3>
             <p className="ZP_prompt-container__category caption">
-              {`카테고리 / ${category.find((item) => item.value === promptCategory).text ?? ''}`}
+              {`${t('filterCategory')} / ${
+                category.find((item) => item.value === promptCategory)?.text ?? ''
+              }`}
             </p>
-            <p className="ZP_prompt-container__description" title={description}>
+            <p className="ZP_prompt-container__description" title={description} translate="yes">
               {description}
             </p>
             <div className="ZP_prompt-container__info-wrapper">
@@ -131,10 +134,10 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
                 className="ZP_prompt-container__date caption"
                 title={`마지막 업데이트 ${formatAgo(updDt * 1000)}`}
               >
-                {formatDateTime(regDt * 1000)}
+                {formatDateTime(regDt * 1000, chrome.i18n.getUILanguage())}
               </p>
               <span className="middot caption">&middot;</span>
-              <p className="caption">{formatHumanReadableNumber(talkCnt)}개의 Talk</p>
+              <p className="caption">{formatHumanReadableNumber(talkCnt)} Talk</p>
             </div>
           </div>
           <div className="ZP_prompt-container__profile-wrapper">
@@ -142,7 +145,7 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
               <span>
                 <img src={writerResponse?.writerImg} alt={writerResponse?.writerNickname} />
               </span>
-              <span>{writerResponse?.writerNickname}</span>
+              <span translate="no">{writerResponse?.writerNickname}</span>
             </div>
             <div className="ZP_prompt-container__actions-wrapper">
               {/* 조회수 */}

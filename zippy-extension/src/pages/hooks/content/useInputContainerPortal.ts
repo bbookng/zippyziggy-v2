@@ -59,7 +59,7 @@ const useInputContainerPortal = () => {
       const isInputWrapper = className?.includes(
         'flex ml-1 md:w-full md:m-auto md:mb-2 gap-0 md:gap-2 justify-center'
       );
-      const isChange = className.includes('relative flex h-full max-w-full flex-1 overflow-hidden');
+      const isChange = className.includes('relative flex h-full flex-1 items-stretch md:flex-col');
 
       return Boolean(isPromptContainer || isRoot || isInputWrapper || isChange);
     };
@@ -70,8 +70,7 @@ const useInputContainerPortal = () => {
       for (const mutation of mutations) {
         const targetElement = mutation.target as Element;
         if (targetElement.className === 'relative flex h-full flex-1 items-stretch md:flex-col') {
-          console.log('에에에');
-          appendShareButton();
+          appendShareButton().then();
         }
         // 맨 위로 가는 버튼이 생길 조건
         if (
@@ -113,7 +112,7 @@ const useInputContainerPortal = () => {
             if ($ZPActionGroup) {
               $ZPActionGroup.classList.remove('ZP_invisible');
             }
-            appendShareButton();
+            appendShareButton().then();
             document.getElementById(ZP_PROMPT_TITLE_HOLDER_ID).parentElement.style.display = 'none';
             const $textarea = document.querySelector(`form textarea`) as HTMLTextAreaElement;
             $textarea.placeholder = 'Send a message.';

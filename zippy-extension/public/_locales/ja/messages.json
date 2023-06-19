@@ -1,0 +1,215 @@
+{
+  "extensionName": {
+    "message": "ZippyZiggy - ChatGPTのプロンプトを共有して簡単に使ってみてください!"
+  },
+  "extensionDescription": {
+    "message": "クリックするだけで簡単に事前に作成したプロンプトを適用してChatGPTと会話できます!"
+  },
+  "authButton": {
+    "message": "アカウント連携"
+  },
+  "shareButton_default": {
+    "message": "会話の内容"
+  },
+  "shareButton_ready": {
+    "message": "共有する"
+  },
+  "shareButton_loading": {
+    "message": "共有中..."
+  },
+  "signInModal_introduce": {
+    "message": "もっと多くの機能を使ってみてください!"
+  },
+  "signUpModal_introduce": {
+    "message": "ニックネームを設定して、会員登録を完了してください!"
+  },
+  "signUpModal_placeholder": {
+    "message": "ニックネームを入力してください。"
+  },
+  "signUpModal_signUpButton": {
+    "message": "会員登録"
+  },
+  "signUpModal_welcomePrefix": {
+    "message": "ようこそ、"
+  },
+  "signUpModal_welcomeSuffix": {
+    "message": "さん!"
+  },
+  "signUpModal_duplicateNicknameMessage": {
+    "message": "重複したニックネームがあります!"
+  },
+  "filterCategory": {
+    "message": "カテゴリー"
+  },
+  "filterCategory_all": {
+    "message": "全て"
+  },
+  "filterCategory_study": {
+    "message": "学習"
+  },
+  "filterCategory_fun": {
+    "message": "エンタメ"
+  },
+  "filterCategory_business": {
+    "message": "ビジネス"
+  },
+  "filterCategory_programming": {
+    "message": "開発"
+  },
+  "filterCategory_etc": {
+    "message": "その他"
+  },
+  "filterCategory_bookmark": {
+    "message": "ブックマーク"
+  },
+  "sortCategory_like": {
+    "message": "人気順"
+  },
+  "sortCategory_mostView": {
+    "message": "閲覧数"
+  },
+  "sortCategory_latest": {
+    "message": "新着順"
+  },
+  "welcomeMessage_prefix": {
+    "message": "ようこそ!"
+  },
+  "welcomeMessage_suffix": {
+    "message": "さん"
+  },
+  "searchInput_placeholder": {
+    "message": "検索語を入力してください。"
+  },
+  "actionDropdown_continueText": {
+    "message": "続けて書く"
+  },
+  "actionDropdown_rewriteText": {
+    "message": "再作成"
+  },
+  "actionDropdown_exemplifyText": {
+    "message": "例示"
+  },
+  "actionDropdown_clarifyText": {
+    "message": "明確に"
+  },
+  "actionDropdown_expandText": {
+    "message": "詳細に"
+  },
+  "actionDropdown_shortenText": {
+    "message": "要約"
+  },
+  "actionDropdown_explainText": {
+    "message": "説明"
+  },
+  "actionDropdown_continueValue": {
+    "message": "答えを続けてください"
+  },
+  "actionDropdown_rewriteValue": {
+    "message": "再度答えてください"
+  },
+  "actionDropdown_exemplifyValue": {
+    "message": "例を挙げてもらえますか？"
+  },
+  "actionDropdown_clarifyValue": {
+    "message": "もっと明確に答えてください"
+  },
+  "actionDropdown_expandValue": {
+    "message": "詳しく答えてください"
+  },
+  "actionDropdown_shortenValue": {
+    "message": "答えを要約してください"
+  },
+  "actionDropdown_explainValue": {
+    "message": "回答の詳しい説明をお願いします"
+  },
+  "languageDropdown_search": {
+    "message": "検索"
+  },
+  "languageDropdown_select": {
+    "message": "言語選択"
+  },
+  "languageDropdown_no": {
+    "message": "設定なし"
+  },
+  "languageDropdown_browser": {
+    "message": "言語検出"
+  },
+  "languageDropdown_ko": {
+    "message": "韓国語"
+  },
+  "languageDropdown_en": {
+    "message": "英語"
+  },
+  "languageDropdown_ja": {
+    "message": "日本語"
+  },
+  "languageDropdown_zhTW": {
+    "message": "繁体字"
+  },
+  "languageDropdown_zhCN": {
+    "message": "簡体字"
+  },
+  "languageDropdown_ur": {
+    "message": "ウルドゥ語"
+  },
+  "languageDropdown_es": {
+    "message": "スペイン語"
+  },
+  "languageDropdown_fr": {
+    "message": "フランス語"
+  },
+  "languageDropdown_de": {
+    "message": "ドイツ語"
+  },
+  "languageDropdown_ru": {
+    "message": "ロシア語"
+  },
+  "languageDropdown_pt": {
+    "message": "ポルトガル語"
+  },
+  "languageDropdown_it": {
+    "message": "イタリア語"
+  },
+  "languageDropdown_vi": {
+    "message": "ベトナム語"
+  },
+  "languageDropdown_th": {
+    "message": "タイ語"
+  },
+  "languageDropdown_id": {
+    "message": "インドネシア語"
+  },
+  "popup_zippyziggyLink": {
+    "message": "ウェブサイトを見る"
+  },
+  "popup_GPTLink": {
+    "message": "ChatGPTで使ってみる"
+  },
+  "popup_cannyLink": {
+    "message": "バグ報告と機能要求"
+  },
+  "popup_notionLink": {
+    "message": "パッチノート"
+  },
+  "popup_version": {
+    "message": "バージョン"
+  },
+  "popup_buildTime": {
+    "message": "ビルド時間"
+  },
+  "errorMessage_conversationsShare": {
+    "message": "会話の共有に失敗しました。"
+  },
+  "errorMessage_serverError": {
+    "message": "server error"
+  },
+  "errorMessage_noContent": {
+    "message": "結果がありません。"
+  },
+  "errorMessage_noAuthentication": {
+    "message": "この機能を利用するにはログインしてください。"
+  },
+  "confirmMessage_conversationsShare": {
+    "message": "会話内容をZippyZiggyと共有しますか？"
+  }
+}
