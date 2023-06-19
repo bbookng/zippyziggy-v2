@@ -64,12 +64,13 @@ public class Talk {
 
 	public static Talk from(TalkRequest data, UUID crntMemberUuid) {
 		return Talk.builder()
-			.memberUuid(crntMemberUuid)
-			.title(data.getTitle())
-			.regDt(LocalDateTime.now())
-			.likeCnt(0L)
-			.hit(0L)
-			.build();
+				.memberUuid(crntMemberUuid)
+				.title(data.getTitle())
+				.regDt(LocalDateTime.now())
+				.likeCnt(0L)
+				.model(data.getModel())
+				.hit(0L)
+				.build();
 	}
 
 	public TalkResponse toTalkResponse() {
@@ -89,19 +90,20 @@ public class Talk {
 		long updDt = this.getRegDt().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
 
 		List<MessageResponse> messageResponses = this.getMessages()
-			.stream()
-			.map(message -> message.toMessageResponse())
-			.collect(Collectors.toList());
+				.stream()
+				.map(message -> message.toMessageResponse())
+				.collect(Collectors.toList());
 
 		return TalkDetailResponse.builder()
-			.title(this.getTitle())
-			.isLiked(isLiked)
-			.likeCnt(likeCnt)
-			.regDt(regDt)
-			.updDt(updDt)
-			.messages(messageResponses)
-			.writer(memberResponse.toWriterResponse())
-			.build();
+				.model(this.model)
+				.title(this.title)
+				.isLiked(isLiked)
+				.likeCnt(likeCnt)
+				.regDt(regDt)
+				.updDt(updDt)
+				.messages(messageResponses)
+				.writer(memberResponse.toWriterResponse())
+				.build();
 	}
 
 	public EsTalkRequest toEsTalkRequest() {

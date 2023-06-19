@@ -11,6 +11,7 @@ public class TalkRequest {
 	@Nullable
 	private String promptUuid;
 	private String title;
+	private String model;
 	private List<MessageRequest> messages;
 
 }

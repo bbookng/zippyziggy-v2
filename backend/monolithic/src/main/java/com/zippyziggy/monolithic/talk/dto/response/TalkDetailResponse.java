@@ -36,4 +36,6 @@ public class TalkDetailResponse {
 	@Nullable
 	private List<TalkListResponse> talkList;
 
+	private String model;
+
 }
