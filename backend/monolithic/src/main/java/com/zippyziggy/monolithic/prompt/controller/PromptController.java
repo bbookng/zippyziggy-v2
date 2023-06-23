@@ -267,6 +267,17 @@ public class PromptController {
 
     }
 
+    @Operation(summary = "ChatGPT API", description = "프롬프트 생성 시 이용하는 ChatGPT API")
+    @PostMapping(value = "/gpt", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    public ResponseEntity<GptApiResponse> testGptApi(@RequestBody GptApiRequest data) {
+        return ResponseEntity.ok(promptService.testGptApi(data));
+    }
+
     @Operation(summary = "Chat GPT APP API", description = "APP에서 프롬프트 바로 이용해보기할 시 사용합니다.")
     @PostMapping(value = "/gpt/app")
     @ApiResponses({

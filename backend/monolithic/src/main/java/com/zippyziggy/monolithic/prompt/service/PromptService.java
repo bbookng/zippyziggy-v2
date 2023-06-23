@@ -733,4 +733,39 @@ public class PromptService{
 		return pagedEsPrompt;
 	}
 
+	public GptApiResponse testGptApi(GptApiRequest data) {
+
+		String prefix = data.getPrefix();
+		String example = data.getExample();
+		String suffix = data.getSuffix();
+
+		String content = "";
+
+		if (prefix != null) {
+			content += prefix;
+		}
+		if (example != null) {
+			content += example;
+		}
+		if (suffix != null) {
+			content += suffix;
+		}
+
+		// create a request
+		List<ChatGptMessage> chatGptMessages = new ArrayList<>();
+		ChatGptMessage chatGptMessage = new ChatGptMessage("user", content);
+		chatGptMessages.add(chatGptMessage);
+		ChatGptRequest request = new ChatGptRequest(MODEL, chatGptMessages);
+
+		// call the API
+		ChatGptResponse response = restTemplate.postForObject(URL, request, ChatGptResponse.class);
+
+		if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+			return new GptApiResponse("No response");
+		}
+
+		// return the first response
+		final String answer = response.getChoices().get(0).getMessage().getContent();
+		return new GptApiResponse(answer);
+	}
 }
