@@ -109,10 +109,6 @@ public class TalkService {
 
             MemberResponse originMember = getMemberInfo(originPrompt.getMemberUuid());
 
-            log.info("Null 확인용 -> ", crntMemberUuid);
-            log.info("Null 확인용 -> ", originPrompt);
-            log.info("Null 확인용 -> ", originMember);
-
             PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid.toString(), originPrompt, originMember);
 
             List<TalkListResponse> talkListResponses = getTalkListResponses(originPrompt, pageable);
@@ -126,9 +122,6 @@ public class TalkService {
     }
 
     private PromptCardResponse getPromptCardResponse(String crntMemberUuid, Prompt originPrompt, MemberResponse originMember) {
-        log.info("Null 확인용 -> ", crntMemberUuid);
-        log.info("Null 확인용 -> ", originPrompt);
-        log.info("Null 확인용 -> ", originMember);
 
         long commentCnt = promptCommentRepository.countAllByPromptPromptUuid(originPrompt.getPromptUuid());
         long forkCnt = promptRepository.countAllByOriginPromptUuidAndStatusCode(originPrompt.getPromptUuid(), StatusCode.OPEN);
