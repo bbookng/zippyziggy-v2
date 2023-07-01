@@ -148,6 +148,7 @@ public class TalkService {
     public List<TalkListResponse> getTalkListResponses(Prompt originPrompt, Pageable pageable) {
 
         List<Talk> talks = talkRepository.findAllByPromptPromptUuid(originPrompt.getPromptUuid(), pageable).toList();
+
         List<TalkListResponse> talkListResponses = getTalks(talks);
 
         return talkListResponses;
