@@ -109,9 +109,9 @@ public class TalkService {
 
             MemberResponse originMember = getMemberInfo(originPrompt.getMemberUuid());
 
-            log.info("crntMemberUuid -> ", crntMemberUuid);
-            log.info("originPrompt -> ", originPrompt);
-            log.info("originMember -> ", originMember);
+            log.info("crntMemberUuid -> ", crntMemberUuid.toString());
+            log.info("originPrompt -> ", originPrompt.getPromptUuid().toString());
+            log.info("originMember -> ", originMember.toString());
 
             PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid.toString(), originPrompt, originMember);
 
@@ -126,6 +126,7 @@ public class TalkService {
     }
 
     private PromptCardResponse getPromptCardResponse(String crntMemberUuid, Prompt originPrompt, MemberResponse originMember) {
+        log.info("getPromptCardResponse Method 접근 확인");
 
         long commentCnt = promptCommentRepository.countAllByPromptPromptUuid(originPrompt.getPromptUuid());
         long forkCnt = promptRepository.countAllByOriginPromptUuidAndStatusCode(originPrompt.getPromptUuid(), StatusCode.OPEN);
