@@ -4,6 +4,7 @@ import { FaComment, FaHeart } from 'react-icons/fa';
 import Router from 'next/router';
 import Link from 'next/link';
 import { ColorBox } from './TalkCardStyle';
+import ProfileImage from '../Image/ProfileImage';
 
 interface PropsType {
   talk: any;
@@ -23,12 +24,10 @@ export default function TalkCard({ talk, url }: PropsType) {
         <div className="footBox">
           <div className="userBox">
             <Link href={`/profile/${talk.writer.writerUuid}`}>
-              <Image
-                priority
+              <ProfileImage
                 src={talk.writer.writerImg}
                 alt="프로필 사진"
-                width={20}
-                height={20}
+                size={20}
                 className="img"
               />
             </Link>

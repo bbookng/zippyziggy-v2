@@ -25,7 +25,7 @@ function ProfileImage({ src, alt = 'image', size = 64, ...rest }: ProfileProps) 
         height: size,
         paddingBottom: size,
         position: 'relative',
-        display: 'inline-block',
+        display: 'flex',
       }}
     >
       <Image
