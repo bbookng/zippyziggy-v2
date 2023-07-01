@@ -109,6 +109,10 @@ public class TalkService {
 
             MemberResponse originMember = getMemberInfo(originPrompt.getMemberUuid());
 
+            log.info("crntMemberUuid -> ", crntMemberUuid);
+            log.info("originPrompt -> ", originPrompt);
+            log.info("originMember -> ", originMember);
+
             PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid.toString(), originPrompt, originMember);
 
             List<TalkListResponse> talkListResponses = getTalkListResponses(originPrompt, pageable);
