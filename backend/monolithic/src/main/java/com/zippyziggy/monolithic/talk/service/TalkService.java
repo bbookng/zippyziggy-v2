@@ -113,7 +113,7 @@ public class TalkService {
             log.info("originPrompt -> ", originPrompt.getPromptUuid().toString());
             log.info("originMember -> ", originMember.toString());
 
-            PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid.toString(), originPrompt, originMember);
+            PromptCardResponse promptCardResponse = getPromptCardResponse(crntMemberUuid, originPrompt, originMember);
 
             List<TalkListResponse> talkListResponses = getTalkListResponses(originPrompt, pageable);
 
