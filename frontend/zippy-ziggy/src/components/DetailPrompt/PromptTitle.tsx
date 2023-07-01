@@ -13,6 +13,7 @@ import {
 import { getDateTime } from '@/lib/utils';
 import { checkLoginCuring } from '@/utils/checkLogin';
 import { ActionBox, Container, PopUp, TitleBox, UserBox } from './PromptTitleStyle';
+import ProfileImage from '../Image/ProfileImage';
 
 interface PropsType {
   prompt: any;
@@ -130,11 +131,9 @@ export default function PromptTitle({
         ) : null}
       </div>
       <UserBox>
-        <Image
-          priority
+        <ProfileImage
           src={prompt?.writer?.writerImg || '/images/noProfile.png'}
-          width={50}
-          height={50}
+          size={50}
           alt="작성자 프로필 이미지"
           className="image"
         />
