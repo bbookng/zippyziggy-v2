@@ -11,6 +11,13 @@ import { FiPlus } from 'react-icons/fi';
 import TalkCard from '@/components/TalkCard/TalkCard';
 import { getTalksListAPI } from '@/core/talk/talkAPI';
 import withDevelopModal from '@/components/HOC/withDevelopModal';
+import {
+  QueryCache,
+  QueryClient,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 function Prompt() {
   const [category, setCategory] = useState<string>('ALL');
@@ -31,11 +38,12 @@ function Prompt() {
       size: 6,
       sort,
     };
-    const data = await getTalksListAPI(requestData);
-    if (data.result === 'SUCCESS') {
-      setCardList(data.data.searchTalkList);
-      setTotalPromptsCnt(data.data.totalTalksCnt);
+    const result = await getTalksListAPI(requestData);
+    if (result.result === 'SUCCESS') {
+      setCardList(result.data.searchTalkList);
+      setTotalPromptsCnt(result.data.totalTalksCnt);
     }
+    return result;
   };
 
   // 검색어 입력시 요청 보냄
@@ -70,15 +78,30 @@ function Prompt() {
     router.push('/talk');
   };
 
+  const { data, refetch, isSuccess } = useQuery(['talks', page.current], handleSearch, {
+    staleTime: 100000,
+  });
+
+  const [renderTrg, setRenderTrg] = useState(false);
+
   // 페이지 이동
-  const handlePage = (number: number) => {
+  const handlePage = async (number: number) => {
     page.current = number - 1;
-    handleSearch();
+    setRenderTrg(!renderTrg);
   };
 
   useEffect(() => {
-    page.current = 0;
-    handleSearch();
+    if (isSuccess) {
+      setCardList(data.data.searchTalkList);
+      setTotalPromptsCnt(data.data.totalTalksCnt);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      page.current = 0;
+      refetch();
+    }
   }, [category, sort, debouncedKeyword]);
 
   return (
@@ -102,7 +125,12 @@ function Prompt() {
           <TalkCard key={talk.talkId} talk={talk} url={`/talks/${talk.talkId}`} />
         ))}
       </CardList>
-      <Paging page={page.current} size={6} totalCnt={totalPromptsCnt || 0} setPage={handlePage} />
+      <Paging
+        page={page.current}
+        size={6}
+        totalCnt={isSuccess ? data.data.totalTalksCnt : 0}
+        setPage={handlePage}
+      />
     </Container>
   );
 }
