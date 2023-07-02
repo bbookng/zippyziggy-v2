@@ -28,6 +28,7 @@ function Prompt() {
   const page = useRef<number>(0);
   const router = useRouter();
   const debouncedKeyword = useDebounce(keyword);
+  const queryClient = useQueryClient();
 
   // 검색 요청
   const handleSearch = async () => {
@@ -79,11 +80,10 @@ function Prompt() {
   };
 
   const { data, refetch, isSuccess } = useQuery(['talks', page.current], handleSearch, {
-    staleTime: 100000,
+    staleTime: 10000,
   });
 
   const [renderTrg, setRenderTrg] = useState(false);
-
   // 페이지 이동
   const handlePage = async (number: number) => {
     page.current = number - 1;
@@ -98,6 +98,7 @@ function Prompt() {
   }, [data]);
 
   useEffect(() => {
+    queryClient.removeQueries(['talks']);
     if (isSuccess) {
       page.current = 0;
       refetch();
