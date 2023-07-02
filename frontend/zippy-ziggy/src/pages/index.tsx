@@ -10,7 +10,7 @@ import Lottie from 'react-lottie-player';
 import lottieJson from '@/assets/lottieJson/background-pattern.json';
 import { links } from '@/utils/links';
 import Router from 'next/router';
-import { getDailyVisited, getTotalVisited } from '@/core/user/userAPI';
+// import { getDailyVisited, getTotalVisited } from '@/core/user/userAPI';
 import TypeIt from 'typeit-react';
 import Button from '@/components/Button/Button';
 import { setPageReset } from '@/core/prompt/promptSlice';
@@ -321,15 +321,16 @@ const Home: NextPage<HomePageProps> = ({ title }) => {
   const [guideNum, setGuideNum] = useState(0);
   const dispatch = useAppDispatch();
 
-  const [totalViewCnt, setTotalViewCnt] = useState(0);
-  const [todayViewCnt, setTodayViewCnt] = useState(0);
+  // 레디스 삭제로 제거
+  // const [totalViewCnt, setTotalViewCnt] = useState(0);
+  // const [todayViewCnt, setTodayViewCnt] = useState(0);
 
-  const getVisitedwCnt = async () => {
-    const totalCnt = await getTotalVisited();
-    setTotalViewCnt(totalCnt?.data?.totalVisitedCount);
-    const todayCnt = await getDailyVisited();
-    setTodayViewCnt(todayCnt?.data?.dailyVisitedCount);
-  };
+  // const getVisitedwCnt = async () => {
+  //   const totalCnt = await getTotalVisited();
+  //   setTotalViewCnt(totalCnt?.data?.totalVisitedCount);
+  //   const todayCnt = await getDailyVisited();
+  //   setTodayViewCnt(todayCnt?.data?.dailyVisitedCount);
+  // };
 
   const handlePromptsBtn = () => {
     dispatch(setPageReset());
@@ -344,9 +345,9 @@ const Home: NextPage<HomePageProps> = ({ title }) => {
     Router.push(links.talks);
   };
 
-  useEffect(() => {
-    getVisitedwCnt();
-  }, []);
+  // useEffect(() => {
+  //   getVisitedwCnt();
+  // }, []);
 
   return (
     <Container>
@@ -421,7 +422,7 @@ const Home: NextPage<HomePageProps> = ({ title }) => {
           </Title>
           <Link href={links.noticeLink}>
             <Paragraph className="sub" color="blackColor90" textAlign="center">
-              버전 1.3.0 release
+              버전 1.3.3 release
             </Paragraph>
           </Link>
           <Link href={links.canny}>
@@ -429,10 +430,10 @@ const Home: NextPage<HomePageProps> = ({ title }) => {
               피드백을 공유해주세요
             </Button>
           </Link>
-          <Paragraph margin="16px 0 0 0" color="blackColor90" textAlign="center" sizeType="xm">
-            누적 방문자 수 : {totalViewCnt} &nbsp;&nbsp;|&nbsp;&nbsp; 오늘 이용자 수 :{' '}
-            {todayViewCnt}
-          </Paragraph>
+          {/* <Paragraph margin="16px 0 0 0" color="blackColor90" textAlign="center" sizeType="xm">
+            누적 방문자 수 : {} &nbsp;&nbsp;|&nbsp;&nbsp; 오늘 이용자 수 :{' '}
+            {}
+          </Paragraph> */}
         </LogoContainer>
       </TitleContainer>
       <div id="guide" className="scriptContainer">

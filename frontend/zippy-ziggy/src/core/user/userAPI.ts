@@ -216,7 +216,7 @@ export const getPromptsMemberAPI = async (requestData: {
 };
 
 /**
- * 맴버가 생성한 프롬프트 조회
+ * 맴버가 북마크한 프롬프트 조회
  * @param id
  * @param page
  * @param size
@@ -246,16 +246,27 @@ export const getPromptsBookmarkAPI = async (requestData: {
 };
 
 /**
- * 맴버가 생성한 프롬프트 조회
+ * 맴버가 좋아요한 프롬프트 조회
  * @param id
  * @param page
  * @param size
  * @returns
  */
-export const getPromptsRecommendAPI = async () => {
+export const getPromptsLikeAPI = async (requestData: {
+  id: string | string[] | number;
+  page: number;
+  size: number;
+}) => {
+  const queryParams = new URLSearchParams({
+    page: String(requestData.page),
+    size: String(requestData.size),
+  }).toString();
   try {
-    const res = await httpAuth.get(`/prompts/recommender`);
+    const res = await http.get(`/members/prompts/like/${requestData.id}?${queryParams}`);
     if (res.status === 200) {
+      if (res.data === '생성한 프롬프트가 존재하지 않습니다.') {
+        return { result: 'FAIL', data: res.data };
+      }
       return { result: 'SUCCESS', data: res.data };
     }
     return { result: 'FAIL', data: res.data };
@@ -294,6 +305,7 @@ export const getTalksProfileAPI = async (requestData: {
   }
 };
 
+// 레디스 삭제로 인해 제거
 export const getTotalVisited = async () => {
   try {
     const res = await http.get(`/members/total/visited`);
@@ -306,6 +318,7 @@ export const getTotalVisited = async () => {
   }
 };
 
+// 레디스 삭제로 인해 제거
 export const getDailyVisited = async () => {
   try {
     const res = await http.get(`/members/daily/visited`);

@@ -22,7 +22,7 @@ import {
 // 프롬프트 목록 조회
 export const getPromptList = async (requestData: GetPromptListType) => {
   try {
-    const { data } = await httpAuth.get(`/search/prompts`, { params: requestData });
+    const { data } = await httpAuth.get(`/prompts`, { params: requestData });
     return { result: 'SUCCESS', data };
   } catch (err) {
     return { result: 'FAIL', data: err };

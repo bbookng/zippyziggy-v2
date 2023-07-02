@@ -96,7 +96,7 @@ export const deleteTalksCommentAPI = async (requestData: {
  */
 export const getTalksListAPI = async (requestData: GetTalksListType) => {
   try {
-    const res = await httpAuth.get(`/search/talks`, { params: requestData });
+    const res = await httpAuth.get(`/talks`, { params: requestData });
     if (res.status === 200) {
       return { result: 'SUCCESS', data: res.data };
     }

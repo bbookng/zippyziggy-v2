@@ -13,6 +13,7 @@ import toastifyCSS from '@/assets/toastify.json';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook';
 import { setIsZippy } from '@/core/zippy/zippySlice';
 import { Body, Conatiner, Content, Footer, Infos, Title } from './CardStyle';
+import ProfileImage from '../Image/ProfileImage';
 
 interface PromptType {
   promptUuid: string;
@@ -137,12 +138,10 @@ export default function PromptCard({ image, title, description, url, prompt }: P
               onClick={handleMoveToUser}
               style={prompt && { cursor: 'pointer' }}
             >
-              <Image
-                priority
+              <ProfileImage
                 src={prompt?.writer?.writerImg || '/images/noProfile.png'}
                 alt="프로필 사진"
-                width={24}
-                height={24}
+                size={24}
                 className="profileImg"
               />
               <div className="nickname">{prompt?.writer?.writerNickname || '닉네임'}</div>

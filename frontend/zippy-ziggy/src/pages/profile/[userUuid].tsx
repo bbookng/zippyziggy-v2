@@ -3,8 +3,8 @@ import ProfileImage from '@/components/Image/ProfileImage';
 import Title from '@/components/Typography/Title';
 import {
   getPromptsBookmarkAPI,
+  getPromptsLikeAPI,
   getPromptsMemberAPI,
-  getPromptsRecommendAPI,
   getTalksProfileAPI,
   getUserAPI,
   postUserLogoutAPI,
@@ -23,7 +23,6 @@ import Paging from '@/components/Paging/Paging';
 import Footer from '@/components/Footer/Footer';
 import Paragraph from '@/components/Typography/Paragraph';
 import { links } from '@/utils/links';
-import ProfileRecommendPromptList from '@/components/DetailPrompt/ProfileRecommendPromptList';
 import { setIsZippy } from '@/core/zippy/zippySlice';
 
 const ProfileContainer = styled.div`
@@ -77,7 +76,7 @@ export default function Index() {
   const [profileImg, setProfileImg] = useState('');
   const router = useRouter();
   const { userUuid, mypage } = router.query as { userUuid: string; mypage: string };
-  const [isSelectedBtn, setIsSelectedBtn] = useState<'prompt' | 'bookmark' | 'recommend'>('prompt');
+  const [isSelectedBtn, setIsSelectedBtn] = useState<'prompt' | 'bookmark' | 'like'>('prompt');
   const [cardList, setCardList] = useState<Array<unknown>>([]);
   const [totalPromptsCnt, setTotalPromptsCnt] = useState<number>(0);
   const page = useRef<number>(0);
@@ -276,20 +275,18 @@ export default function Index() {
           >
             북마크
           </Button>
-          {isMyPage ? (
-            <Button
-              isRound
-              display="inline-block"
-              color="whiteColor100"
-              fontColor="blackColor70"
-              margin="4px"
-              padding="0 32px"
-              width="1"
-              onClick={() => setIsSelectedBtn('recommend')}
-            >
-              추천
-            </Button>
-          ) : null}
+          <Button
+            isRound
+            display="inline-block"
+            color="whiteColor100"
+            fontColor="blackColor70"
+            margin="4px"
+            padding="0 32px"
+            width="1"
+            onClick={() => setIsSelectedBtn('like')}
+          >
+            좋아요
+          </Button>
         </div>
         <ProfilePromptList
           className={isSelectedBtn === 'prompt' ? 'visible' : 'invisible'}
@@ -304,12 +301,12 @@ export default function Index() {
           size={6}
           getData={getPromptsBookmarkAPI}
         />
-        {isMyPage ? (
-          <ProfileRecommendPromptList
-            className={isSelectedBtn === 'recommend' ? 'visible' : 'invisible'}
-            size={6}
-          />
-        ) : null}
+        <ProfilePromptList
+          className={isSelectedBtn === 'like' ? 'visible' : 'invisible'}
+          userUuid={userUuid}
+          size={6}
+          getData={getPromptsLikeAPI}
+        />
       </ProfilePromptContainer>
       <ProfileTalkContainer>
         <Title>대화</Title>
