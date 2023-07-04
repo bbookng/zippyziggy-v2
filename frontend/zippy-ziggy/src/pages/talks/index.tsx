@@ -1,20 +1,13 @@
-import Button from '@/components/Button/Button';
 import FeedCategory from '@/components/Category/FeedCategory';
-import PromptCard from '@/components/PromptCard/PromptCard';
 import Search from '@/components/Search/Search';
 import { CardList, Container, SearchBox, SortBox, TitleBox } from '@/styles/prompt/List.style';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import Paging from '@/components/Paging/Paging';
 import useDebounce from '@/hooks/useDebounce';
-import { FiPlus } from 'react-icons/fi';
 import TalkCard from '@/components/TalkCard/TalkCard';
 import { getTalksListAPI } from '@/core/talk/talkAPI';
-import withDevelopModal from '@/components/HOC/withDevelopModal';
 import {
-  QueryCache,
-  QueryClient,
-  useInfiniteQuery,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
@@ -24,7 +17,6 @@ function Prompt() {
   const [sort, setSort] = useState<string>('likeCnt');
   const [keyword, setKeyword] = useState<string>('');
   const [cardList, setCardList] = useState<Array<unknown>>([]);
-  const [totalPromptsCnt, setTotalPromptsCnt] = useState<number>(0);
   const page = useRef<number>(0);
   const router = useRouter();
   const debouncedKeyword = useDebounce(keyword);
@@ -42,7 +34,6 @@ function Prompt() {
     const result = await getTalksListAPI(requestData);
     if (result.result === 'SUCCESS') {
       setCardList(result.data.searchTalkList);
-      setTotalPromptsCnt(result.data.totalTalksCnt);
     }
     return result;
   };
@@ -90,18 +81,20 @@ function Prompt() {
     setRenderTrg(!renderTrg);
   };
 
+  // Cardlist 렌더링
   useEffect(() => {
-    if (isSuccess) {
+    if(data?.data?.searchTalkList){
       setCardList(data.data.searchTalkList);
-      setTotalPromptsCnt(data.data.totalTalksCnt);
+      setRenderTrg(!renderTrg);
     }
   }, [data]);
 
+  // Cardlist 검색 등 변경
   useEffect(() => {
-    queryClient.removeQueries(['talks']);
-    if (isSuccess) {
+    if (data?.data?.searchTalkList) {
       page.current = 0;
       refetch();
+      queryClient.removeQueries(['talks']);
     }
   }, [category, sort, debouncedKeyword]);
 

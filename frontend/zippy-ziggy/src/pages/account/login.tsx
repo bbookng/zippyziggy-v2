@@ -1,45 +1,9 @@
-import Button from '@/components/Button/Button';
-import Image from 'next/image';
 import { FcGoogle } from 'react-icons/fc';
 import { RiKakaoTalkFill } from 'react-icons/ri';
 import IconButton from '@/components/Button/IconButton';
 import router from 'next/router';
-import styled, { useTheme } from 'styled-components';
 import Title from '@/components/Typography/Title';
-import { media } from '@/styles/media';
-
-export const LoginContainer = styled.div`
-  width: 100%;
-  height: 100vh;
-  padding: 16px;
-  background-color: ${({ theme: { colors } }) => colors.whiteColor100};
-`;
-
-export const LoginWarp = styled.div`
-  max-width: 300px;
-  margin: auto;
-
-  .kakao {
-    background-color: #ffff16;
-    color: #3b1a1f;
-  }
-
-  .google {
-    background-color: ${({ theme: { colors } }) => colors.whiteColor};
-    color: ${({ theme: { colors } }) => colors.blackColor};
-    border: 1px solid ${({ theme: { colors } }) => colors.blackColor05};
-  }
-
-  .LogoImage {
-    object-fit: contain;
-    cursor: pointer;
-    margin: auto;
-    ${media.small`
-      width: 100px;
-      height: 48px;
-    `}
-  }
-`;
+import { LoginContainer, LoginWarp } from '@/components/Account/Login.styled';
 
 export default function Login() {
   const HandleKakaoLogin = () => {

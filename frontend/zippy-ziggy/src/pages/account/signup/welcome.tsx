@@ -1,69 +1,13 @@
 import Paragraph from '@/components/Typography/Paragraph';
 import Title from '@/components/Typography/Title';
-import { media } from '@/styles/media';
 import router from 'next/router';
-import styled from 'styled-components';
 import lottieJson from '@/assets/lottieJson/congratulation-sparkle.json';
 import Lottie from 'react-lottie-player';
 import Link from 'next/dist/client/link';
-import Button from '@/components/Button/Button';
 import IconButton from '@/components/Button/IconButton';
 import { FiLink2 } from 'react-icons/fi';
-import { downloadLink, links } from '@/utils/links';
-
-const LoginContainer = styled.div`
-  width: 100%;
-  height: 100vh;
-  padding: 16px;
-  background-color: ${({ theme: { colors } }) => colors.whiteColor100};
-`;
-
-const LoginWarp = styled.div`
-  max-width: 720px;
-  width: 100%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  align-items: center;
-
-  .kakao {
-    background-color: #ffff16;
-    color: #3b1a1f;
-  }
-
-  .google {
-    background-color: ${({ theme: { colors } }) => colors.whiteColor};
-    color: ${({ theme: { colors } }) => colors.blackColor};
-    border: 1px solid ${({ theme: { colors } }) => colors.blackColor05};
-  }
-
-  .LogoImage {
-    object-fit: contain;
-    cursor: pointer;
-    margin: auto;
-    ${media.small`
-      width: 100px;
-      height: 48px;
-    `}
-  }
-`;
-
-const LottieWrap = styled.div`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-
-  .lottie {
-    pointer-events: none;
-    background-color: transparent;
-    width: 600px;
-  }
-`;
+import { links } from '@/utils/links';
+import { LottieWrap, WelcomeContainer, WelcomeWarp } from '@/components/Account/Signup.style';
 
 export default function Index() {
   const { nickname } = router.query;
@@ -73,11 +17,11 @@ export default function Index() {
   };
 
   return (
-    <LoginContainer>
+    <WelcomeContainer>
       <LottieWrap>
         <Lottie className="lottie" loop animationData={lottieJson} play />
       </LottieWrap>
-      <LoginWarp>
+      <WelcomeWarp>
         <Title textAlign="center" margin="32px 0 0 0">
           {nickname}님 환영합니다!
         </Title>
@@ -105,7 +49,7 @@ export default function Index() {
             GPT 확장 다운로드
           </span>
         </IconButton>
-      </LoginWarp>
-    </LoginContainer>
+      </WelcomeWarp>
+    </WelcomeContainer>
   );
 }

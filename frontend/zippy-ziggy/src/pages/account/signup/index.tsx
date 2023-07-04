@@ -5,9 +5,7 @@ import Title from '@/components/Typography/Title';
 import Paragraph from '@/components/Typography/Paragraph';
 import Button from '@/components/Button/Button';
 // Http 요청 모듈을 import
-import { http, httpForm } from '@/lib/http';
-import { media } from '@/styles/media';
-import styled from 'styled-components';
+import { httpForm } from '@/lib/http';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook';
 import { setIsLogin, setNickname, setProfileImg, setUserUuid } from '@/core/user/userSlice';
 import ProfileImage from '@/components/Image/ProfileImage';
@@ -22,41 +20,7 @@ import Link from 'next/link';
 import { postCongratulationAlarms } from '@/core/notice/noticeAPI';
 import axios from 'axios';
 import imgComp from '@/utils/imgComp';
-
-const LoginContainer = styled.div`
-  width: 100%;
-  padding: 48px 16px 0px 16px;
-  height: 100vh;
-  background-color: ${({ theme: { colors } }) => colors.whiteColor100};
-`;
-
-const LoginWarp = styled.div`
-  max-width: 360px;
-
-  margin: auto;
-
-  .LogoImage {
-    object-fit: contain;
-    cursor: pointer;
-    margin: auto;
-    ${media.small`
-      width: 100px;
-      height: 48px;
-    `}
-  }
-
-  .nickNameInput {
-    width: 100%;
-    height: 48px;
-    border: 1px solid ${({ theme: { colors } }) => colors.blackColor05};
-  }
-
-  .legal {
-    margin: 0 0 12px 0;
-    padding: 16px;
-    background-color: ${({ theme: { colors } }) => colors.bgColor};
-  }
-`;
+import { SignupContainer, SignupWarp } from '@/components/Account/Signup.style';
 
 // 이미지 파일이면 URL.createObjectURL() 메서드를 이용하여 이미지 URL을 생성합니다
 const ImagePreview = ({ file, queryProfileImg }) => {
@@ -164,7 +128,7 @@ export default function SignUp() {
 
     // user 정보 넣기
     if (file) {
-      const imageFile = await imgComp({ image: file, maxSizeMB: 0.5, maxWidthOrHeight: 128 });
+      const imageFile = await imgComp({ image: file, maxSizeMB: 0.5, maxWidthOrHeight: 256 });
       formData.append('file', imageFile);
     } else {
       const fileToAppend = file || new File([new Blob()], 'empty_image.png', { type: 'image/png' });
@@ -204,8 +168,8 @@ export default function SignUp() {
   };
 
   return (
-    <LoginContainer>
-      <LoginWarp>
+    <SignupContainer>
+      <SignupWarp>
         <Title margin="0 0 4px 0">{userName}님 반가워요!</Title>
         <Paragraph margin="0 0 12px 0">닉네임을 설정하고 회원가입을 완료하세요!</Paragraph>
 
@@ -271,7 +235,7 @@ export default function SignUp() {
             회원가입
           </Button>
         </form>
-      </LoginWarp>
-    </LoginContainer>
+      </SignupWarp>
+    </SignupContainer>
   );
 }

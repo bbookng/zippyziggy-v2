@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { http, httpAuth } from '@/lib/http';
-import { createSlice } from '@reduxjs/toolkit';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHook';
+import { useAppDispatch } from '@/hooks/reduxHook';
 import { setIsLogin, setNickname, setProfileImg, setUserUuid } from '@/core/user/userSlice';
 import { getGoogleAPI, getKakaoAPI } from '@/core/user/userAPI';
 import LottieAnimation from '@/components/LottieFiles/LoadingA';

@@ -6,10 +6,6 @@ import Paragraph from '@/components/Typography/Paragraph';
 import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
 
-import Link from 'next/link';
-import { links } from '@/utils/links';
-import Button from '@/components/Button/Button';
-
 const Container = styled.div`
   width: 100%;
   height: 100vh;
