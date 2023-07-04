@@ -128,7 +128,7 @@ export default function SignUp() {
 
     // user 정보 넣기
     if (file) {
-      const imageFile = await imgComp({ image: file, maxSizeMB: 0.5, maxWidthOrHeight: 128 });
+      const imageFile = await imgComp({ image: file, maxSizeMB: 0.5, maxWidthOrHeight: 256 });
       formData.append('file', imageFile);
     } else {
       const fileToAppend = file || new File([new Blob()], 'empty_image.png', { type: 'image/png' });
