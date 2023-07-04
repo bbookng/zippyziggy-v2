@@ -1,3 +1,4 @@
+import GlobalStyle from '@/styles/Global.style';
 import useDarkMode from '@/hooks/useDarkMode';
 import { media } from '@/styles/media';
 import { darkTheme, lightTheme } from '@/styles/theme';
@@ -16,9 +17,6 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DefaultHead from '@/components/Head/DefaultHead';
 import Construction from './construction';
-import GlobalStyle from '@/styles/Gloabal.style';
-
-
 
 const queryClient = new QueryClient({
   defaultOptions: {
