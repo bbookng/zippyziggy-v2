@@ -1,23 +1,6 @@
 import ProfileImage from '@/components/Image/ProfileImage';
+import { ProfileContainer, ProfileHeaderContainer } from '@/components/Profile/Profile404.styled';
 import Title from '@/components/Typography/Title';
-import { useRouter } from 'next/router';
-import styled from 'styled-components';
-
-const ProfileContainer = styled.div`
-  width: 100%;
-  height: 100vh;
-  background-color: ${({ theme: { colors } }) => colors.whiteColor100};
-`;
-
-const ProfileHeaderContainer = styled.div`
-  width: 100%;
-  padding: 48px 0px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme: { colors } }) => colors.whiteColor100};
-`;
 
 export default function Index() {
   return (

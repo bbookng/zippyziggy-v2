@@ -1,10 +1,5 @@
-import styled from 'styled-components';
-import { serverUrl } from '@/lib/http';
 import { useEffect, useState } from 'react';
-import { EventListener, EventSourcePolyfill } from 'event-source-polyfill';
 import { useAppSelector, useAppDispatch } from '@/hooks/reduxHook';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Title from '@/components/Typography/Title';
 import {
   deleteNoticeItemAPI,
@@ -14,72 +9,10 @@ import {
   putNoticeItemAPI,
   putNoticeListAPI,
 } from '@/core/notice/noticeAPI';
-import Router from 'next/router';
 import NoticesList from '@/components/Notice/NoticeList';
 // userSlice에서 유저 정보 변경
 import { setNoticeCount } from '@/core/user/userSlice';
-
-const Container = styled.div`
-  width: 100%;
-`;
-
-const Wrap = styled.div`
-  padding: 48px 24px 48px 24px;
-  margin: auto;
-  display: flex;
-  max-width: 480px;
-  flex-direction: column;
-  button {
-    :hover {
-      background-color: ${({ theme }) => theme.colors.linkColor};
-      transform: translate(0px, -2px);
-    }
-  }
-  .allButtonsContainer {
-    button {
-      margin: 8px 8px 8px 0px;
-      background-color: ${({ theme }) => theme.colors.whiteColor70};
-    }
-  }
-
-  ul {
-    border-radius: 8px;
-    cursor: pointer;
-    li {
-      border-top: 1px solid ${({ theme }) => theme.colors.blackColor05};
-      border-left: 1px solid ${({ theme }) => theme.colors.blackColor05};
-      border-right: 1px solid ${({ theme }) => theme.colors.blackColor05};
-      padding: 16px;
-      &.read {
-        color: ${({ theme }) => theme.colors.blackColor30};
-      }
-      &.unread {
-        background-color: ${({ theme }) => theme.colors.linkColor};
-        color: ${({ theme }) => theme.colors.whiteColor};
-        font-weight: 600;
-      }
-      .buttonContainer {
-        margin-top: 8px;
-        display: flex;
-        justify-content: flex-end;
-        button {
-          margin-left: 8px;
-          background-color: ${({ theme }) => theme.colors.whiteColor10};
-        }
-      }
-    }
-  }
-  .moreBtn {
-    border-radius: 0 0 8px 8px;
-  }
-`;
-
-type EventListType = {
-  url: string;
-  content: string;
-  alarmId: number;
-  userEmail: string;
-};
+import { Container, Wrap } from '@/components/Notification/Notification.style';
 
 function Index() {
   // let eventSource: EventSourcePolyfill | undefined;
@@ -111,65 +44,6 @@ function Index() {
     getNoticeList();
     getNoticeListSize();
   }, [token]);
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem('accessToken');
-  //   if (!listening && token && !eventSource) {
-  //     // sse 연결
-  //     eventSource = new EventSourcePolyfill(`${serverUrl}/api/notice/subscribe`, {
-  //       headers: {
-  //         'Content-Type': 'text/event-stream',
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       heartbeatTimeout: 86400000,
-  //       withCredentials: true,
-  //     });
-
-  //     // 최초 연결
-  //     eventSource.onopen = (event) => {
-  //       console.log('onopen');
-  //       setListening(true);
-  //     };
-
-  //     // 서버에서 메시지 날릴 때
-  //     eventSource.onmessage = (event) => {
-  //       // setSseData(event.data);
-  //       // setRespon(true);
-  //       // console.log('onmessage');
-  //       // if (event.data !== undefined) alert(event.data);
-  //     };
-
-  //     eventSource.addEventListener('sse', ((event: MessageEvent) => {
-  //       if (!event.data.includes('EventStream')) {
-  //         const eventData: EventListType = JSON.parse(event.data);
-  //         // console.log(eventData);
-  //         toast.success(`${eventData.content}`, {
-  //           onClick: () => {
-  //             Router.push(`/notification`);
-  //           },
-  //           icon: '🚀',
-  //           position: 'bottom-right',
-  //           autoClose: 1000,
-  //           hideProgressBar: false,
-  //           closeOnClick: true,
-  //           pauseOnHover: true,
-  //           draggable: true,
-  //           progress: undefined,
-  //         });
-  //       }
-  //     }) as EventListener);
-  //   } else {
-  //     console.log('logout');
-  //     eventSource?.close();
-  //   }
-
-  //   return () => {
-  //     if (!token && eventSource !== undefined) {
-  //       eventSource.close();
-  //       setListening(false);
-  //     }
-  //   };
-  // }, [userState.nickname]);
 
   // 모두 삭제 클릭
   const handleNoticeDelete = async () => {
