@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
@@ -43,9 +44,15 @@ public class ForkPromptService {
 	private final MemberRepository memberRepository;
 	private final SecurityUtil securityUtil;
 
-	public ForkPromptResponse createForkPrompt(UUID promptUuid, PromptRequest data, MultipartFile thumbnail) {
+	public ForkPromptResponse createForkPrompt(UUID promptUuid, PromptRequest data, @Nullable MultipartFile thumbnail) {
 
-		String thumbnailUrl = awsS3Uploader.upload(thumbnail, "thumbnails");
+		String thumbnailUrl;
+
+		if (thumbnail == null) {
+			thumbnailUrl = "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noCardImg.png";
+		} else {
+			thumbnailUrl = awsS3Uploader.upload(thumbnail, "thumbnails");
+		}
 
 		Prompt prompt = Prompt.from(data, securityUtil.getCurrentMember().getUserUuid(), thumbnailUrl);
 		prompt.setOriginPromptUuid(promptUuid);
