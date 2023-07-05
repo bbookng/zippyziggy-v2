@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,12 +71,12 @@ public class PromptService{
 
 
 	// Exception 처리 필요
-	public PromptResponse createPrompt(PromptRequest data, MultipartFile thumbnail) {
+	public PromptResponse createPrompt(PromptRequest data, @Nullable MultipartFile thumbnail) {
 		UUID crntMemberUuid = securityUtil.getCurrentMember().getUserUuid();
 		String thumbnailUrl;
 
 		if (thumbnail == null) {
-			thumbnailUrl = "default thumbnail image";
+			thumbnailUrl = "https://zippyziggy.s3.ap-northeast-2.amazonaws.com/default/noCardImg.png";
 		} else {
 			thumbnailUrl = awsS3Uploader.upload(thumbnail, "thumbnails");
 		}

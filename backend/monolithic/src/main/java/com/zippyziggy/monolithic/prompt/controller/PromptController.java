@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class PromptController {
             @ApiResponse(responseCode = "500", description = "서버 에러")
     })
     public ResponseEntity<PromptResponse> createPrompt(@RequestPart PromptRequest data,
-                                                       @RequestPart MultipartFile thumbnail) {
+                                                       @RequestPart @Nullable MultipartFile thumbnail) {
         return ResponseEntity.ok(promptService.createPrompt(data, thumbnail));
     }
 
