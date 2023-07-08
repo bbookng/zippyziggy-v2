@@ -202,9 +202,11 @@ public class PromptService{
 		// 원본 id가 현재 프롬프트 아이디와 같지 않으면 포크된 프롬프트
 		if (prompt.isForked()) {
 			UUID originalMemberUuid = promptRepository
-					.findByOriginPromptUuidAndPromptUuid(prompt.getOriginPromptUuid(), promptUuid)
+					.findByPromptUuid(prompt.getOriginPromptUuid())
 					.orElseThrow(PromptNotFoundException::new)
 					.getMemberUuid();
+
+			log.info("originMemberUuid -> ", originalMemberUuid);
 
 			// 탈퇴한 사용자일 시에 예외를 던지지 않고, 빈 객체를 보내서 사용자 정보 없음으로 표시
 			MemberResponse originalMemberInfo;
