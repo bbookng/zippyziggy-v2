@@ -4,7 +4,7 @@ import { ZP_INPUT_WRAPPER_ID, ZP_PROMPT_CONTAINER_ID } from '@pages/constants';
 const addRootWrapperToTargetElement = ($target: HTMLElement) => {
   const rootWrapper = document.createElement('div');
   rootWrapper.className = 'px-2 py-10 relative w-full flex flex-col h-full';
-  ($target.parentElement.querySelector('div:first-of-type') as HTMLElement).style.display = 'none';
+  ($target.parentElement.querySelector('div:nth-of-type(2)') as HTMLElement).style.display = 'none';
   $target = $target.parentElement;
   $target.appendChild(rootWrapper);
   return rootWrapper;
@@ -16,18 +16,20 @@ export const findTargetElement = ($parent: Element, isPlus: boolean) => {
 
   if (isPlus) {
     $target = $parent.querySelector(
-      'div.px-2.relative.w-full.flex.flex-col.h-full.py-2.md\\:py-6'
+      'div.px-2.w-full.flex.flex-col.py-2.md\\:py-6.sticky.top-0'
     ) as HTMLElement;
+    ($target.nextSibling as HTMLElement).style.display = 'none';
+    $target = $target.parentElement;
   } else {
     $target = $parent.querySelector(
-      'div.text-gray-800.w-full.md\\:max-w-2xl.lg\\:max-w-3xl.md\\:h-full.md\\:flex.md\\:flex-col.px-6.dark\\:text-gray-100'
+      'div.text-gray-800.w-full.mx-auto.md\\:max-w-2xl.lg\\:max-w-3xl.md\\:flex.md\\:flex-col.px-6.dark\\:text-gray-100'
     ) as HTMLElement;
-
     if ($target) {
       $target = addRootWrapperToTargetElement($target);
     }
   }
 
+  (document.querySelector('div.sticky') as HTMLElement).style.zIndex = '100';
   return $target;
 };
 
@@ -61,7 +63,7 @@ export const shouldCreatePromptContainerPortal = (
   const isNewChatPage = isNewChatPageRef.current;
 
   return (
-    targetElement.className === 'flex flex-col text-sm dark:bg-gray-800' ||
+    targetElement.className === 'flex flex-col h-full text-sm dark:bg-gray-800' ||
     targetElement.className.includes('relative flex h-full max-w-full flex-1') ||
     (isNewChatPage && targetElement.className === 'overflow-hidden w-full h-full relative flex') ||
     (isNewChatPage &&

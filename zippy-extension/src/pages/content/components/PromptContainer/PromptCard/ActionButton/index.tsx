@@ -3,6 +3,7 @@ import { ZIPPY_SITE_URL } from '@pages/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleBookmarkPrompt, toggleLikePrompt } from '@pages/content/apis/prompt';
 import { getAccessToken } from '@pages/content/utils/apis/interceptors';
+import t from '@src/chrome/i18n';
 
 interface ActionButtonProps {
   name: string;
@@ -125,7 +126,7 @@ const ActionButton = ({ name, type, promptUuid, fill, queryKeyItems }: ActionBut
     e.stopPropagation();
     const accessToken = await getAccessToken();
     if (!accessToken) {
-      alert('test');
+      alert(t('errorMessage_noAuthentication'));
       return;
     }
     toggleBookmark();
@@ -135,7 +136,7 @@ const ActionButton = ({ name, type, promptUuid, fill, queryKeyItems }: ActionBut
     e.stopPropagation();
     const accessToken = await getAccessToken();
     if (!accessToken) {
-      alert('test');
+      alert(t('errorMessage_noAuthentication'));
       return;
     }
     toggleLike();
