@@ -29,7 +29,6 @@ export const findTargetElement = ($parent: Element, isPlus: boolean) => {
     }
   }
 
-  (document.querySelector('div.sticky') as HTMLElement).style.zIndex = '100';
   return $target;
 };
 
@@ -63,7 +62,7 @@ export const shouldCreatePromptContainerPortal = (
   const isNewChatPage = isNewChatPageRef.current;
 
   return (
-    targetElement.className === 'flex flex-col h-full text-sm dark:bg-gray-800' ||
+    targetElement.className === 'flex flex-col text-sm dark:bg-gray-800 h-full' ||
     targetElement.className.includes('relative flex h-full max-w-full flex-1') ||
     (isNewChatPage && targetElement.className === 'overflow-hidden w-full h-full relative flex') ||
     (isNewChatPage &&
@@ -80,7 +79,8 @@ export const hideEmptyDiv = (targetElement: Element) => {
     targetElement.id === ZP_INPUT_WRAPPER_ID ||
     targetElement.className === 'flex-1 overflow-hidden' ||
     targetElement.className ===
-      'h-full flex ml-1 md:w-full md:m-auto md:mb-2 gap-0 md:gap-2 justify-center'
+      'h-full flex ml-1 md:w-full md:m-auto md:mb-2 gap-0 md:gap-2 justify-center' ||
+    targetElement.className === 'flex flex-col text-sm dark:bg-gray-800 h-full'
   ) {
     const $unlessElement = document.querySelector(
       'div.h-32.md\\:h-48.flex-shrink-0'

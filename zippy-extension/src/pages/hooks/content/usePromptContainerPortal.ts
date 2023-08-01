@@ -8,6 +8,7 @@ import {
   shouldCreatePromptContainerPortal,
 } from '@pages/content/utils/extension/add-ui-to-prompt-portals';
 import { ZP_PROMPT_CONTAINER_ID } from '@pages/constants';
+import intervalForFindElement from '@pages/content/utils/extension/intervalForFindElement';
 
 const usePromptListPortal = () => {
   const [portalContainer, setPortalContainer] = useState(null); // 포탈 컨테이너를 저장하는 state
@@ -41,6 +42,11 @@ const usePromptListPortal = () => {
       return;
     }
 
+    intervalForFindElement('div.sticky.flex', ($target) => {
+      const 지피티_버전_선택 = $target;
+      지피티_버전_선택.style.zIndex = '100';
+    });
+
     // 포탈 컨테이너를 대상 요소에 추가하고, state를 업데이트하여 포탈 컨테이너를 반환함
     $target.appendChild($portalContainer);
     setPortalContainer($portalContainer);
@@ -57,7 +63,8 @@ const usePromptListPortal = () => {
         for (const mutation of mutations) {
           const $targetElement = mutation.target as HTMLElement;
           if (!document.querySelector('h1.text-4xl')) {
-            if ($targetElement.className === 'flex flex-col h-full text-sm dark:bg-gray-800') {
+            // 처음 채팅 후 프롬프트 리스트 없애기
+            if ($targetElement.className === 'flex flex-col text-sm dark:bg-gray-800') {
               const $ZPPromptContainer = document.querySelector(
                 `#${ZP_PROMPT_CONTAINER_ID}`
               ) as HTMLElement;
