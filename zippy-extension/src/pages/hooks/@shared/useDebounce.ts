@@ -11,7 +11,7 @@ const useDebounce = <T>(value: T, delay = 500): T => {
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // 이전 타이머를 제거
+    // 이전 타이머를 제거함
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
