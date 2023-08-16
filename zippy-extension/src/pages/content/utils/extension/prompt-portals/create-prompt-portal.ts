@@ -4,6 +4,7 @@ import { findTargetElementByGPTVersion } from '@pages/content/utils/extension/pr
 import { findRegenerateButton } from '@pages/content/utils/extension/common/find-regenerate-button';
 import { ZP_PROMPT_CONTAINER_ID } from '@pages/constants';
 
+// react-scroll-to-bottom 클래스를 가진 부모 요소를 찾음
 export const findParentElementWithReactScrollClass = () => {
   const reactScrollSelector = '[class*="react-scroll-to-bottom"]';
   return document.querySelector(reactScrollSelector);
@@ -33,12 +34,17 @@ export const createPromptPortal = (setPortalContainer) => {
   if (!$portalContainer) return;
 
   const $title = document.querySelector('h1.text-4xl') as HTMLElement;
+
   let isPlus = false;
+
   if ($title) {
     $title.style.display = 'none';
     isPlus = $title.textContent === 'ChatGPTPlus';
   }
-  ($title.parentElement.nextSibling as HTMLElement).style.display = 'none';
+
+  // GPT 버전 선택 아래 빈 div를 제거
+  const unlessDiv = $title.parentElement.nextSibling as HTMLElement;
+  unlessDiv.style.display = 'none';
 
   // ChatGPTPlus 여부를 확인하고, 대상 요소를 찾음
   const $target = findTargetElementByGPTVersion($parent, isPlus);

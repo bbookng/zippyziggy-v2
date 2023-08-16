@@ -12,6 +12,7 @@ export const hideEmptyDiv = (targetElement: Element) => {
     const $unlessElement = document.querySelector(
       'div.h-32.md\\:h-48.flex-shrink-0'
     ) as HTMLDivElement;
+
     if ($unlessElement) {
       $unlessElement.style.display = 'none';
     }
