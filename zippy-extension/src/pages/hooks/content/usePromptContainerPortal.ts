@@ -1,94 +1,49 @@
-import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
-import {
-  createPromptContainer,
-  findParentElementWithReactScrollClass,
-  findRegenerateButton,
-  findTargetElement,
-  hideEmptyDiv,
-  shouldCreatePromptContainerPortal,
-} from '@pages/content/utils/extension/add-ui-to-prompt-portals';
-import { ZP_PROMPT_CONTAINER_ID } from '@pages/constants';
-import intervalForFindElement from '@pages/content/utils/extension/intervalForFindElement';
+import { useCallback, useEffect, useState } from 'react';
+import { createPromptPortal } from '@pages/content/utils/extension/prompt-portals/create-prompt-portal';
+import { hideEmptyDiv } from '@pages/content/utils/extension/common/hide-empty-div';
+import { shouldCreatePromptContainerPortal } from '@pages/content/utils/extension/prompt-portals/should-create-prompt-container-portal';
+import { handleInitialChatPromptList } from '@pages/content/utils/extension/prompt-portals/handle-initial-chat-prompt-list';
 
 const usePromptListPortal = () => {
-  const [portalContainer, setPortalContainer] = useState(null); // 포탈 컨테이너를 저장하는 state
-  const isNewChatPage = useRef<boolean>(!window.location.href.includes('/c/')); // 현재 페이지가 새 채팅 페이지인지 여부를 저장하는 useRef
+  // 포탈 컨테이너를 저장하기 위한 state
+  const [portalContainer, setPortalContainer] = useState(null);
 
-  const createPromptContainerPortal = useCallback(() => {
-    // react-scroll-to-bottom 클래스를 가진 부모 요소를 찾음
-    const $parent = findParentElementWithReactScrollClass();
-    if (!$parent) return;
+  const createPromptPortalCallback = useCallback(() => createPromptPortal(setPortalContainer), []);
 
-    // 응답 재생성 버튼을 찾음
-    const $regenerateButton = findRegenerateButton();
-    if ($regenerateButton) return;
+  const observeNextElement = useCallback(() => {
+    // 변동사항을 처리하기 위한 핸들러
+    const mutationHandler = (mutations) => {
+      for (const mutation of mutations) {
+        const $targetElement = mutation.target as HTMLElement;
 
-    // 포탈 컨테이너를 생성함
-    const $portalContainer = createPromptContainer();
-    if (!$portalContainer) return;
-
-    const $title = document.querySelector('h1.text-4xl') as HTMLElement;
-    let isPlus = false;
-    if ($title) {
-      $title.style.display = 'none';
-      isPlus = $title.textContent === 'ChatGPTPlus';
-    }
-
-    // ChatGPTPlus 여부를 확인하고, 대상 요소를 찾음
-    const $target = findTargetElement($parent, isPlus);
-    // 대상 요소를 찾지 못한 경우 포탈 생성 실패
-    if (!$target) {
-      setPortalContainer(null);
-      return;
-    }
-
-    intervalForFindElement('div.sticky.flex', ($target) => {
-      const 지피티_버전_선택 = $target;
-      지피티_버전_선택.style.zIndex = '100';
-    });
-
-    // 포탈 컨테이너를 대상 요소에 추가하고, state를 업데이트하여 포탈 컨테이너를 반환함
-    $target.appendChild($portalContainer);
-    setPortalContainer($portalContainer);
-  }, []);
-
-  useEffect(() => {
-    // MutationObserver 를 이용하여 __next 요소의 자식요소 추가, 제거, 변경을 감지하고,
-    // 해당되는 경우 포탈을 생성하도록 createPromptPortal 함수를 호출함
-    const observeNextElement = (
-      isNewChatPageRef: MutableRefObject<boolean>,
-      createPromptContainerPortal: () => void
-    ) => {
-      const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          const $targetElement = mutation.target as HTMLElement;
-          if (!document.querySelector('h1.text-4xl')) {
-            // 처음 채팅 후 프롬프트 리스트 없애기
-            if ($targetElement.className === 'flex flex-col text-sm dark:bg-gray-800') {
-              const $ZPPromptContainer = document.querySelector(
-                `#${ZP_PROMPT_CONTAINER_ID}`
-              ) as HTMLElement;
-              if ($ZPPromptContainer) $ZPPromptContainer.style.display = 'none';
-            }
-          }
-          // 대상 요소가 포탈을 생성해야 하는지 판단
-          if (shouldCreatePromptContainerPortal($targetElement, isNewChatPageRef)) {
-            createPromptContainerPortal();
-            return;
-          }
-          // 필요없는 div 제거
-          hideEmptyDiv($targetElement);
+        // 첫 화면에서 대화 시작 시 promptContainer 숨기기
+        if (!document.querySelector('h1.text-4xl')) {
+          handleInitialChatPromptList($targetElement);
         }
-      });
-      observer.observe(document.getElementById('__next'), { subtree: true, childList: true });
 
-      return () => {
-        observer.disconnect();
-      };
+        // 프롬프트 컨테이너 생성이 필요한 경우 체크
+        if (shouldCreatePromptContainerPortal($targetElement)) {
+          createPromptPortalCallback();
+          return;
+        }
+
+        // GPT 대화 화면의 불필요한 div 요소 제거
+        hideEmptyDiv($targetElement);
+      }
     };
 
-    return observeNextElement(isNewChatPage, createPromptContainerPortal);
-  }, [createPromptContainerPortal, isNewChatPage]);
+    // 대상 요소의 변동사항을 관찰하는 MutationObserver 객체 생성
+    const observer = new MutationObserver(mutationHandler);
+    observer.observe(document.getElementById('__next'), { subtree: true, childList: true });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [createPromptPortalCallback]);
+
+  useEffect(() => {
+    return observeNextElement();
+  }, [observeNextElement]);
 
   return portalContainer;
 };
