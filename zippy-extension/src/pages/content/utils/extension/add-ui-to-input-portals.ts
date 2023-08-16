@@ -26,6 +26,7 @@ export const removeFormParentClasses = (formParent) => {
 
   $formParent.classList.remove(...classesToRemove);
   $formParent.classList.add('relative');
+  $formParent.parentElement.classList.add('flex-col');
   $formParent.id = ZP_INPUT_SECTION_ID;
 };
 
