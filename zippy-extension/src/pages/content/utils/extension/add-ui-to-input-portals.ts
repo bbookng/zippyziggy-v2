@@ -9,10 +9,10 @@ import {
   ZP_TO_TOP_BUTTON_ID,
 } from '@pages/constants';
 import logo from '@assets/img/icon16.png';
-import { findRegenerateButton } from '@pages/content/utils/extension/add-ui-to-prompt-portals';
 import { authApi } from '@pages/content/utils/apis/axios-instance';
 import throttle from '@pages/content/utils/@shared/throttle';
 import t from '@src/chrome/i18n';
+import { findRegenerateButton } from '@pages/content/utils/extension/common/find-regenerate-button';
 
 export const removeFormParentClasses = (formParent) => {
   const $formParent = formParent;
@@ -330,6 +330,7 @@ export const appendPromptLink = async () => {
   //   ) as HTMLElement;
   // }
 };
+
 const handleShareButtonClick = async ($shareButton) => {
   let isRequesting = false; // 공유 요청 state 관리
   const model = 'Model: Default (GPT-3.5)'; // GPT 모델
