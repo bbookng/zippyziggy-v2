@@ -5,17 +5,15 @@ import {
   ZP_PROMPT_CONTAINER_ID,
   ZP_PROMPT_TITLE_HOLDER_ID,
 } from '@pages/constants';
-import {
-  addToggleButton,
-  addToTopButton,
-  adjustToBottomButtonPosition,
-  appendShareButton,
-  createPortalContainer,
-  removeFormParentClasses,
-  setInputWrapperStyle,
-} from '@pages/content/utils/extension/add-ui-to-input-portals';
 import { findRegenerateButton } from '@pages/content/utils/extension/common/find-regenerate-button';
 import { hideEmptyDiv } from '@pages/content/utils/extension/common/hide-empty-div';
+import { removeFormParentClasses } from '@pages/content/utils/extension/input-portals/remove-form-parent-classes';
+import { createPortalContainer } from '@pages/content/utils/extension/input-portals/create-portal-container';
+import { addToggleButton } from '@pages/content/utils/extension/input-portals/add-toggle-button';
+import { addToTopButton } from '@pages/content/utils/extension/input-portals/add-to-top-button';
+import { setInputWrapperStyle } from '@pages/content/utils/extension/input-portals/set-input-wrapper-style';
+import { appendShareButton } from '@pages/content/utils/extension/input-portals/append-share-button';
+import { adjustToBottomButtonPosition } from '@pages/content/utils/extension/input-portals/adjust-to-top-button-position';
 
 const useInputContainerPortal = () => {
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
