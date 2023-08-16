@@ -10,26 +10,27 @@ const addRootWrapperToTargetElement = ($target: HTMLElement) => {
   return rootWrapper;
 };
 
+// GPT 유료버전(isPlus가 참일 때 대상 요소를 찾는 함수)
+const findPlusTarget = ($parent: Element): HTMLElement | null => {
+  const $target = $parent.querySelector(
+    'div.px-2.w-full.flex.flex-col.py-2.md\\:py-6.sticky.top-0'
+  ) as HTMLElement;
+  if ($target) {
+    ($target.nextSibling as HTMLElement).style.display = 'none';
+    return $target.parentElement;
+  }
+  return null;
+};
+
+// GPT 무료버전(isPlus가 거짓일 때 대상 요소를 찾는 함수)
+const findNonPlusTarget = ($parent: Element): HTMLElement | null => {
+  const $target = $parent.querySelector('div.align-center.flex.h-full') as HTMLElement;
+  return $target ? addRootWrapperToTargetElement($target) : null;
+};
+
 // 대상 요소를 찾아 반환하는 함수
 export const findTargetElement = ($parent: Element, isPlus: boolean) => {
-  let $target: HTMLElement | null = null;
-
-  if (isPlus) {
-    $target = $parent.querySelector(
-      'div.px-2.w-full.flex.flex-col.py-2.md\\:py-6.sticky.top-0'
-    ) as HTMLElement;
-    ($target.nextSibling as HTMLElement).style.display = 'none';
-    $target = $target.parentElement;
-  } else {
-    $target = $parent.querySelector(
-      'div.text-gray-800.w-full.mx-auto.md\\:max-w-2xl.lg\\:max-w-3xl.md\\:flex.md\\:flex-col.px-6.dark\\:text-gray-100'
-    ) as HTMLElement;
-    if ($target) {
-      $target = addRootWrapperToTargetElement($target);
-    }
-  }
-
-  return $target;
+  return isPlus ? findPlusTarget($parent) : findNonPlusTarget($parent);
 };
 
 // regenerate 버튼을 반환하는 함수
