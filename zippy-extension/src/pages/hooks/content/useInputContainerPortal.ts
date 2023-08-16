@@ -1,73 +1,28 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  CHAT_GPT_URL,
-  ZP_INPUT_WRAPPER_ID,
-  ZP_PROMPT_CONTAINER_ID,
-  ZP_PROMPT_TITLE_HOLDER_ID,
-} from '@pages/constants';
+import { ZP_INPUT_WRAPPER_ID, ZP_PROMPT_TITLE_HOLDER_ID } from '@pages/constants';
 import { findRegenerateButton } from '@pages/content/utils/extension/common/find-regenerate-button';
 import { hideEmptyDiv } from '@pages/content/utils/extension/common/hide-empty-div';
-import { removeFormParentClasses } from '@pages/content/utils/extension/input-portals/remove-form-parent-classes';
-import { createPortalContainer } from '@pages/content/utils/extension/input-portals/create-portal-container';
-import { addToggleButton } from '@pages/content/utils/extension/input-portals/add-toggle-button';
 import { addToTopButton } from '@pages/content/utils/extension/input-portals/add-to-top-button';
-import { setInputWrapperStyle } from '@pages/content/utils/extension/input-portals/set-input-wrapper-style';
 import { appendShareButton } from '@pages/content/utils/extension/input-portals/append-share-button';
 import { adjustToBottomButtonPosition } from '@pages/content/utils/extension/input-portals/adjust-to-top-button-position';
+import { shouldCreateInputWrapperPortal } from '@pages/content/utils/extension/input-portals/should-create-input-wrapper-portal';
+import { addInputWrapperPortal } from '@pages/content/utils/extension/input-portals/add-input-wrapper-portal';
+import { shouldAddToTopButton } from '@pages/content/utils/extension/input-portals/should-add-to-top-button';
 
 const useInputContainerPortal = () => {
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
 
-  const addInputWrapperPortal = useCallback(() => {
-    const existingPortal = document.getElementById(ZP_INPUT_WRAPPER_ID);
-    if (existingPortal) return;
-
-    const $formParent = document.querySelector('form:not(.signup__form)')?.parentElement;
-    if (!$formParent) return;
-
-    // 클래스 제거
-    removeFormParentClasses($formParent);
-    // 인풋 포탈을 생성
-    const $inputWrapperPortal = createPortalContainer();
-    if (!$inputWrapperPortal) return;
-
-    // 토글 버튼을 생성 후 주입
-    addToggleButton($formParent);
-    // 입력창 focus 시 border 스타일 지정
-    setInputWrapperStyle($inputWrapperPortal.parentElement);
-    const $selectedPromptTitleWrapper = document.createElement('div');
-
-    const $selectedPromptTitle = document.createElement('p');
-    $selectedPromptTitle.id = ZP_PROMPT_TITLE_HOLDER_ID;
-
-    $inputWrapperPortal.prepend($selectedPromptTitleWrapper);
-    $selectedPromptTitleWrapper.appendChild($selectedPromptTitle);
-    const message = { type: 'renderInputPortals' };
-    window.postMessage(message, CHAT_GPT_URL);
-    setPortalContainer($inputWrapperPortal);
-  }, []);
+  const memoizedAddInputWrapperPortal = useCallback(
+    () => addInputWrapperPortal(setPortalContainer),
+    []
+  );
 
   useEffect(() => {
-    const shouldCreateInputWrapperPortal = (element: Element): boolean => {
-      const { id, className } = element;
-      const isPromptContainer = id === ZP_PROMPT_CONTAINER_ID;
-      const isRoot = id === '__next';
-      const isInputWrapper = className?.includes(
-        'h-full flex ml-1 md:w-full md:m-auto md:mb-4 gap-0 md:gap-2 justify-center'
-      );
-      const isChange = className.includes(
-        'relative h-full w-full transition-width flex flex-col overflow-auto items-stretch flex-1'
-      );
-
-      return Boolean(isPromptContainer || isRoot || isInputWrapper || isChange);
-    };
-
     // MutationObserver를 이용하여 __next 요소의 자식요소 추가, 제거, 변경을 감지하고,
     // 해당되는 경우 포탈을 생성하도록 addPromptContainerPortal 함수를 호출함
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         const targetElement = mutation.target as Element;
-        console.log(targetElement.className);
         if (
           targetElement.className ===
           'absolute p-1 rounded-md md:bottom-3 md:p-2 md:right-3 dark:hover:bg-gray-900 dark:disabled:hover:bg-transparent right-2 disabled:text-gray-400 enabled:bg-brand-purple text-white bottom-1.5 transition-colors disabled:opacity-40'
@@ -76,14 +31,7 @@ const useInputContainerPortal = () => {
         }
 
         // 맨 위로 가는 버튼이 생길 조건
-        if (
-          (targetElement.id === ZP_INPUT_WRAPPER_ID &&
-            document.querySelector("[class^='react-scroll-to-bottom--css']")?.children[0]) ||
-          (targetElement.className === 'ZP_prompt-container__inner' &&
-            document.querySelector("[class^='react-scroll-to-bottom--css']")?.children[0]) ||
-          (targetElement.className === 'flex-1 overflow-hidden' &&
-            document.querySelector("[class^='react-scroll-to-bottom--css']")?.children[0])
-        ) {
+        if (shouldAddToTopButton(targetElement)) {
           const scrollWrapper = document.querySelector("[class^='react-scroll-to-bottom--css']")
             ?.children[0];
           if (scrollWrapper.scrollHeight >= scrollWrapper.clientHeight) {
@@ -107,7 +55,7 @@ const useInputContainerPortal = () => {
         // 포탈이 생길 조건
         if (shouldCreateInputWrapperPortal(targetElement)) {
           // 포탈 생성
-          addInputWrapperPortal();
+          memoizedAddInputWrapperPortal();
 
           // 쉐어버튼 생성
           const $regenerateButton = findRegenerateButton();
@@ -136,7 +84,7 @@ const useInputContainerPortal = () => {
     return () => {
       observer.disconnect();
     };
-  }, [addInputWrapperPortal]);
+  }, [memoizedAddInputWrapperPortal]);
 
   return portalContainer;
 };
