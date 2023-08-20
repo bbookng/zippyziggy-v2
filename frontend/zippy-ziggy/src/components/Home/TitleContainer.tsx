@@ -90,7 +90,7 @@ const TitleContainer = () => {
         </Title>
         <Link href={links.noticeLink}>
           <Paragraph className="sub" color="blackColor90" textAlign="center">
-            버전 1.3.4 release
+            버전 1.3.7 release
           </Paragraph>
         </Link>
         <Link href={links.canny}>
