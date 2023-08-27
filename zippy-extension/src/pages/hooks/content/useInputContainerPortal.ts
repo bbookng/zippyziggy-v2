@@ -23,7 +23,18 @@ const useInputContainerPortal = () => {
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         const targetElement = mutation.target as Element;
-        if (targetElement.className === 'relative flex h-full flex-1 items-stretch md:flex-col') {
+
+        // 조건 상수 부분
+        const IS_RESPONSE_WIDTH_CHANGE =
+          targetElement.className === 'relative flex h-full flex-1 items-stretch md:flex-col';
+        const SHOULD_SHOW_QUICK_FEATURES = targetElement.id === ZP_INPUT_WRAPPER_ID;
+        const SHOULD_ADJUST_BOTTOM_BUTTON_POSITION = targetElement.className.includes(
+          'react-scroll-to-bottom--css'
+        );
+        // -------------------------------------------------------------------------------------
+
+        // client.width(반응형)가 변할 때 마다 공유 버튼 렌더링
+        if (IS_RESPONSE_WIDTH_CHANGE) {
           appendShareButton();
         }
 
@@ -36,7 +47,8 @@ const useInputContainerPortal = () => {
           }
         }
 
-        if (targetElement.id === ZP_INPUT_WRAPPER_ID) {
+        // 간편 기능이 보일 조건
+        if (SHOULD_SHOW_QUICK_FEATURES) {
           const $ZPActionGroup = document.querySelector('#ZP_actionGroup');
           if (!$ZPActionGroup) return;
           const isNewChatPage = !window.location.href.includes('/c/');
@@ -45,7 +57,7 @@ const useInputContainerPortal = () => {
         }
 
         // GPT 사이트의 맨 아래로 가는 버튼의 위치를 조정
-        if (targetElement.className.includes('react-scroll-to-bottom--css')) {
+        if (SHOULD_ADJUST_BOTTOM_BUTTON_POSITION) {
           adjustToBottomButtonPosition(targetElement as HTMLElement);
         }
 
