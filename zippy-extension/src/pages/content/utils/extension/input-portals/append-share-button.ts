@@ -137,7 +137,7 @@ const handleShareButtonClick = async ($shareButton) => {
   }
 };
 
-export const appendShareButton = async () => {
+export const appendShareButton = () => {
   chrome.storage.sync.get('accessToken', ({ accessToken }) => {
     if (!accessToken) return;
 
@@ -146,6 +146,8 @@ export const appendShareButton = async () => {
 
     if (findRegenerateButton()) {
       findRegenerateButton().insertAdjacentElement('beforebegin', $shareButton);
+      // 대화내용 공유 버튼 위치 조정
+      $shareButton.parentElement.classList.add('flex');
     }
 
     $shareButton.addEventListener(

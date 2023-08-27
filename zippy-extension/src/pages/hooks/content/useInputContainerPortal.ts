@@ -23,10 +23,7 @@ const useInputContainerPortal = () => {
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         const targetElement = mutation.target as Element;
-        if (
-          targetElement.className ===
-          'absolute p-1 rounded-md md:bottom-3 md:p-2 md:right-3 dark:hover:bg-gray-900 dark:disabled:hover:bg-transparent right-2 disabled:text-gray-400 enabled:bg-brand-purple text-white bottom-1.5 transition-colors disabled:opacity-40'
-        ) {
+        if (targetElement.className === 'relative flex h-full flex-1 items-stretch md:flex-col') {
           appendShareButton();
         }
 
@@ -64,7 +61,9 @@ const useInputContainerPortal = () => {
             if ($ZPActionGroup) {
               $ZPActionGroup.classList.remove('ZP_invisible');
             }
-            appendShareButton().then();
+
+            appendShareButton();
+
             document.getElementById(ZP_PROMPT_TITLE_HOLDER_ID).parentElement.style.display = 'none';
             const $textarea = document.querySelector(`form textarea`) as HTMLTextAreaElement;
             $textarea.placeholder = 'Send a message.';

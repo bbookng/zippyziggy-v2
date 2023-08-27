@@ -20,7 +20,6 @@ export const createShareButton = () => {
 
   const $shareButtonContent = document.createElement('div');
   $shareButtonContent.classList.add('flex', 'w-full', 'gap-2', 'items-center', 'justify-center');
-
   if (document.body.clientWidth >= 768) {
     $shareButtonContent.innerHTML = `
     ${SHARE_DESKTOP_SVG}
