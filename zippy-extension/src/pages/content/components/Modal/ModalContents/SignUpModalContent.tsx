@@ -4,9 +4,9 @@ import { checkNicknameDuplicate, signUp } from '@pages/content/apis/member';
 import useChromeStorage from '@pages/hooks/@shared/useChromeStorage';
 import { CHROME_USERINFO_KEY } from '@pages/constants';
 import { SignUpResult } from '@pages/content/apis/member/models';
-import Logo from '@pages/content/components/PromptContainer/Logo';
 import delayPromise from '@pages/content/utils/@shared/delay-promise';
 import t from '@src/chrome/i18n';
+import ZippyZiggyLogo from '@pages/content/components/Icons/ZippyZiggyLogo';
 
 interface SignUpModalContentProps {
   userData: {
@@ -71,7 +71,7 @@ const SignUpModalContent = ({ userData }: SignUpModalContentProps) => {
 
   return (
     <div className="signup__wrapper">
-      <Logo />
+      <ZippyZiggyLogo />
       <h3 className="signup__title">
         <span>
           <img src={profileImg} alt={name} />

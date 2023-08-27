@@ -1,6 +1,4 @@
-import React from 'react';
-
-const Logo = () => {
+export default function ZippyZiggyLogo() {
   return (
     <svg
       id="ZP_logo"
@@ -74,6 +72,4 @@ const Logo = () => {
       </defs>
     </svg>
   );
-};
-
-export default Logo;
+}

@@ -1,4 +1,5 @@
 import { ZP_TO_TOP_BUTTON_ID } from '@pages/constants';
+import { TOP_ARROW } from '@pages/content/components/Icons';
 
 export const addToTopButton = ($formParent) => {
   const $toTopButton = document.createElement('button');
@@ -6,12 +7,7 @@ export const addToTopButton = ($formParent) => {
 
   if (document.getElementById(ZP_TO_TOP_BUTTON_ID)) return;
 
-  $toTopButton.innerHTML = `
-  <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 m-1" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="transform: scale(1, -1);">
-  <line x1="12" y1="5" x2="12" y2="19"></line>
-  <polyline points="19 12 12 19 5 12"></polyline>
-</svg>
-`;
+  $toTopButton.innerHTML = TOP_ARROW;
   $toTopButton.classList.add(
     'cursor-pointer',
     'absolute',
