@@ -26,7 +26,7 @@ const ZIPPY = (window.ZIPPYZIGGY = {
       ? DEFAULT_TARGET_LANGUAGE
       : localStorage.getItem(LAST_TARGET_LANGUAGE_KEY),
   
-  fetch: (window._fetch = window._fetch || window.fetch),
+  fetch: (window._fetch = window._fetch || window.fetch.bind(window)),
   
   replaceFetch() {
     console.log("replace 실행");

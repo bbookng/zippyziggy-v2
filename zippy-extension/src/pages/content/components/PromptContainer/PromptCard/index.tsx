@@ -125,7 +125,7 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
             </h3>
             <p className="ZP_prompt-container__category caption">
               {`${t('filterCategory')} / ${
-                category.find((item) => item.value === promptCategory)?.text ?? ''
+                category.find((item) => item.id === promptCategory)?.text ?? ''
               }`}
             </p>
             <p className="ZP_prompt-container__description" title={description} translate="yes">
