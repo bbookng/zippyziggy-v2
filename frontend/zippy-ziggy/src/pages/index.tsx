@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-
-import { media } from '@/styles/media';
 import { NextPage } from 'next';
 import Footer from '@/components/Footer/Footer';
 // import { getDailyVisited, getTotalVisited } from '@/core/user/userAPI';
-import { useAppDispatch } from '@/hooks/reduxHook';
-import { Container } from '@/components/Home/Home.style';
-import TalksContainer from '@/components/Home/TalksContainer';
-import ScriptContainer from '@/components/Home/ScriptContainer';
 import GuideContainer from '@/components/Home/GuideContainer';
+import { Container } from '@/components/Home/Home.style';
+import ScriptContainer from '@/components/Home/ScriptContainer';
+import TalksContainer from '@/components/Home/TalksContainer';
 import TitleContainer from '@/components/Home/TitleContainer';
 
 interface HomePageProps {
