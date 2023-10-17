@@ -1,5 +1,5 @@
-import { media } from '@/styles/media';
 import styled from 'styled-components';
+import { media } from '@/styles/media';
 
 export const Container = styled.div`
   width: 100%;
@@ -211,6 +211,7 @@ export const StyledTitleContainer = styled.div`
 `;
 
 export const LogoContainer = styled.div`
+  text-align: center;
   margin-bottom: 2rem;
 `;
 

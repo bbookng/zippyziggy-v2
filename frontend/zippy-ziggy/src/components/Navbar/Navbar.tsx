@@ -72,10 +72,11 @@ const Navbar = ({ toggleTheme }) => {
   // 다운로드 페이지로 이동
   const handleDownloadBtn = (e) => {
     e.preventDefault();
-    Router.push(links.downloadLink);
+    // Router.push(links.downloadLink);
+    window.open(links.downloadLink, "_blank");
   };
 
-  // 다운로드 페이지로 이동
+  // 알람 페이지로 이동
   const handleNoticeBtn = (e) => {
     e.preventDefault();
     Router.push(links.notification);
