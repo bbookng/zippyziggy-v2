@@ -23,17 +23,15 @@ const useDarkMode = () => {
   // => useEffect를 통해 마운트 후 사용
   useEffect(() => {
     const localTheme = window.localStorage.getItem('theme');
-
-    // 이용자가 다크모드를 선호하면 다크 모드로 보여주는 로직
-    // 위에 localTheme을 받아서 !localTheme 처리 이유는
-    // 처음에는 로컬에 저장된게 없으니 false로 나오기 때문에 true로 바꿔주고
-    // 둘다 true일 때만 처리해주기
-    window.matchMedia('(prefers-color-scheme:dark)').matches && !localTheme
-      ? setMode('dark')
-      : localTheme === 'dark'
-      ? setMode('dark')
-      : setMode('light');
+    if (localTheme) {
+      setMode(localTheme);
+    } else if (window.matchMedia('(prefers-color-scheme:dark)').matches) {
+      setMode('dark');
+    } else {
+      setMode('light');
+    }
   }, []);
+
   return { colorTheme, toggleTheme };
 };
 

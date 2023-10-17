@@ -1,24 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { FaBars } from 'react-icons/fa';
 import Link from 'next/link';
-import { useTheme } from 'styled-components';
 import Router from 'next/router';
+import { useEffect, useState } from 'react';
+import { FaBars } from 'react-icons/fa';
+import { useTheme } from 'styled-components';
 
 // userSlice에서 유저 정보 변경
 import {
-  setIsLogin,
   setNickname,
   setProfileImg,
   setUserReset,
-  setUserUuid,
+  setUserUuid
 } from '@/core/user/userSlice';
 
 // sse 관련 import
-import { EventListener, EventSourcePolyfill } from 'event-source-polyfill';
-import { serverUrl } from '@/lib/http';
 import { getNoticeUnreadCountAPI } from '@/core/notice/noticeAPI';
+import { serverUrl } from '@/lib/http';
+import { EventListener, EventSourcePolyfill } from 'event-source-polyfill';
 
 // toast 관련 import
 import { toast } from 'react-toastify';
@@ -30,11 +29,11 @@ import { links } from '@/utils/links';
 
 import { FiBell, FiSun } from 'react-icons/fi';
 
-import { getTokenAPI } from '@/core/user/userAPI';
 import { setPageReset } from '@/core/prompt/promptSlice';
-import { NavWrapper, NavList, NavOption, Logo, NavUser, Overlay } from './NavbarStyle';
+import { getTokenAPI } from '@/core/user/userAPI';
 import Button from '../Button/Button';
 import ProfileImage from '../Image/ProfileImage';
+import { Logo, NavList, NavOption, NavUser, NavWrapper, Overlay } from './NavbarStyle';
 
 const Navbar = ({ toggleTheme }) => {
   const userState = useAppSelector((state) => state.user); // 유저정보
@@ -262,7 +261,11 @@ const Navbar = ({ toggleTheme }) => {
         </NavOption>
         <NavOption
           onClick={toggleTheme}
-          onKeyDown={toggleTheme}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {  // 'Enter'나 'Space' 키가 눌렸을 때만
+              toggleTheme();
+            }
+          }}
           tabIndex={navOptions.length + 1}
           role="button"
           className="themeBtn iconSet"
