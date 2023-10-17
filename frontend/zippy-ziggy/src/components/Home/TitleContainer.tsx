@@ -1,16 +1,16 @@
-import { StyledTitleContainer, Logo, LogoContainer } from '@/components/Home/Home.style';
 import { useState } from 'react';
-
 import Lottie from 'react-lottie-player';
+import Router from 'next/router';
+import Link from 'next/link';
+import { Logo, LogoContainer, StyledTitleContainer } from '@/components/Home/Home.style';
+
 import lottieJson from '@/assets/lottieJson/background-pattern.json';
 
 import { links } from '@/utils/links';
-import Router from 'next/router';
 
+import Button from '@/components/Button/Button';
 import Paragraph from '@/components/Typography/Paragraph';
 import Title from '@/components/Typography/Title';
-import Link from 'next/link';
-import Button from '@/components/Button/Button';
 
 const TitleContainer = () => {
   const [isPlaying1, setIsPlaying1] = useState(false);
@@ -90,7 +90,7 @@ const TitleContainer = () => {
         </Title>
         <Link href={links.noticeLink}>
           <Paragraph className="sub" color="blackColor90" textAlign="center">
-            버전 1.3.4 release
+            버전 1.3.9 release
           </Paragraph>
         </Link>
         <Link href={links.canny}>
