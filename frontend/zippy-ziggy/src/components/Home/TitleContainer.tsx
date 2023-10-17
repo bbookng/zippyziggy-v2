@@ -1,16 +1,20 @@
-import { StyledTitleContainer, Logo, LogoContainer } from '@/components/Home/Home.style';
+import Link from 'next/link';
+import Router from 'next/router';
 import { useState } from 'react';
-
 import Lottie from 'react-lottie-player';
+import styled from 'styled-components';
+import { Logo, LogoContainer, StyledTitleContainer } from '@/components/Home/Home.style';
+
 import lottieJson from '@/assets/lottieJson/background-pattern.json';
 
 import { links } from '@/utils/links';
-import Router from 'next/router';
 
-import Paragraph from '@/components/Typography/Paragraph';
-import Title from '@/components/Typography/Title';
-import Link from 'next/link';
 import Button from '@/components/Button/Button';
+import Title from '@/components/Typography/Title';
+
+const StyledAnchor = styled.a`
+  color: ${({ color, theme: { colors } }) => colors[color]};
+`;
 
 const TitleContainer = () => {
   const [isPlaying1, setIsPlaying1] = useState(false);
@@ -88,11 +92,15 @@ const TitleContainer = () => {
           <br />
           GPT 프롬프트 및 대화 공유 사이트 ZippyZiggy
         </Title>
-        <Link href={links.noticeLink}>
-          <Paragraph className="sub" color="blackColor90" textAlign="center">
-            버전 1.3.7 release
-          </Paragraph>
-        </Link>
+        <StyledAnchor
+          className="sub"
+          color="blackColor90"
+          target="_blank"
+          rel="noopener noreferrer"
+          href={links.noticeLink}
+        >
+          버전 1.3.9 release
+        </StyledAnchor>
         <Link href={links.canny}>
           <Button buttonType="outline" margin="16px 0 16px 0">
             피드백을 공유해주세요

@@ -43,3 +43,6 @@ next-env.d.ts
 
 # public
 /public/resources
+
+.idea
+.history
