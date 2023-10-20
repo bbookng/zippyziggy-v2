@@ -3,11 +3,12 @@ import { ZP_INPUT_WRAPPER_ID, ZP_PROMPT_TITLE_HOLDER_ID } from '@pages/constants
 import { findRegenerateButton } from '@pages/content/utils/extension/common/find-regenerate-button';
 import { hideEmptyDiv } from '@pages/content/utils/extension/common/hide-empty-div';
 import { addToTopButton } from '@pages/content/utils/extension/input-portals/add-to-top-button';
-import { appendShareButton } from '@pages/content/utils/extension/input-portals/append-share-button';
 import { adjustToBottomButtonPosition } from '@pages/content/utils/extension/input-portals/adjust-to-top-button-position';
 import { shouldCreateInputWrapperPortal } from '@pages/content/utils/extension/input-portals/should-create-input-wrapper-portal';
 import { addInputWrapperPortal } from '@pages/content/utils/extension/input-portals/add-input-wrapper-portal';
 import { shouldAddToTopButton } from '@pages/content/utils/extension/input-portals/should-add-to-top-button';
+import { appendShareButton } from '@pages/content/utils/extension/input-portals/append-share-button';
+import { containsAllClasses } from '@src/utils';
 
 const useInputContainerPortal = () => {
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
@@ -23,16 +24,17 @@ const useInputContainerPortal = () => {
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         const targetElement = mutation.target as Element;
-
         // 조건 상수 부분
-        const IS_RESPONSE_WIDTH_CHANGE =
-          targetElement.className === 'relative flex h-full flex-1 items-stretch md:flex-col';
+        const IS_RESPONSE_WIDTH_CHANGE = containsAllClasses(
+          targetElement.className,
+          'relative flex h-full flex-1 items-stretch md:flex-col'
+        );
         const SHOULD_SHOW_QUICK_FEATURES = targetElement.id === ZP_INPUT_WRAPPER_ID;
         const SHOULD_ADJUST_BOTTOM_BUTTON_POSITION = targetElement.className.includes(
           'react-scroll-to-bottom--css'
         );
         // -------------------------------------------------------------------------------------
-
+        console.log(targetElement.className);
         // client.width(반응형)가 변할 때 마다 공유 버튼 렌더링
         if (IS_RESPONSE_WIDTH_CHANGE) {
           appendShareButton();
