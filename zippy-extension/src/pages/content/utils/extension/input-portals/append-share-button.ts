@@ -50,8 +50,8 @@ const createMessage = (role, content) => ({
 
 const getMessagesFromThread = ($threadContainer: HTMLElement) => {
   const messages = [];
-
   for (const node of $threadContainer.children) {
+    if (node.tagName === 'HEADER') continue;
     const markdown = node.querySelector('.markdown') as HTMLElement;
     if ([...node.classList].includes('dark:bg-gray-800')) {
       const warning = node.querySelector('.text-orange-500') as HTMLElement;
@@ -80,6 +80,7 @@ const getConversationData = async (model) => {
     'flex flex-col text-sm dark:bg-gray-800'
   )[0] as HTMLElement;
 
+  console.log($threadContainer);
   const isChatGptPlus = isChatGptPlusUser();
   let $firstConversation = $threadContainer.firstChild;
   if (isChatGptPlus) {
