@@ -15,7 +15,6 @@ const usePromptListPortal = () => {
     const mutationHandler = (mutations) => {
       for (const mutation of mutations) {
         const $targetElement = mutation.target as HTMLElement;
-
         // 첫 화면에서 대화 시작 시 promptContainer 숨기기
         if (!document.querySelector('h1.text-4xl')) {
           handleInitialChatPromptList($targetElement);

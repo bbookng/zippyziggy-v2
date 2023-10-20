@@ -89,4 +89,22 @@ const formatHumanReadableNumber = (number: number) => {
   return `${(number / 1000000).toFixed(1)}M`;
 };
 
-export { sanitizeInput, formatDateTime, formatAgo, formatHumanReadableNumber };
+const normalizeClassName = (className: string) => {
+  return className.split(/\s+/).sort().join(' ').trim();
+};
+
+const containsAllClasses = (targetClassName: string, requiredClassName: string) => {
+  const targetClasses = new Set(targetClassName.split(/\s+/));
+  const requiredClasses = requiredClassName.split(/\s+/);
+
+  return requiredClasses.every((cls) => targetClasses.has(cls));
+};
+
+export {
+  sanitizeInput,
+  formatDateTime,
+  formatAgo,
+  formatHumanReadableNumber,
+  normalizeClassName,
+  containsAllClasses,
+};

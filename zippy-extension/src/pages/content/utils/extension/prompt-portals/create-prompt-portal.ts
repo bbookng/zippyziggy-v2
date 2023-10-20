@@ -43,8 +43,8 @@ export const createPromptPortal = (setPortalContainer) => {
   }
 
   // GPT 버전 선택 아래 빈 div를 제거
-  const unlessDiv = $title.parentElement.nextSibling as HTMLElement;
-  unlessDiv.style.display = 'none';
+  // const unlessDiv = $title.parentElement.nextSibling as HTMLElement;
+  // unlessDiv.style.display = 'none';
 
   // ChatGPTPlus 여부를 확인하고, 대상 요소를 찾음
   const $target = findTargetElementByGPTVersion($parent, isPlus);

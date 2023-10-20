@@ -68,6 +68,7 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
     ) as HTMLElement;
     $selectedPromptTitle.textContent = `📟 ${title}`;
     $selectedPromptTitle.dataset.promptUuid = promptUuid;
+    $selectedPromptTitle.style.marginBottom = '0.5rem';
 
     window.postMessage(message, CHAT_GPT_URL);
     if (document.getElementById('ZP_cancelPromptButton')) {
@@ -78,12 +79,15 @@ const PromptCard = ({ name, prompt, queryKeyItems }: PromptCardProps) => {
     $cancelPromptButton.id = 'ZP_cancelPromptButton';
     $cancelPromptButton.textContent = 'X';
     $cancelPromptButton.style.display = 'block';
+    $selectedPromptTitle.style.display = 'block';
+
     $cancelPromptButton.addEventListener('click', () => {
       window.postMessage({ type: 'cancelPrompt' }, CHAT_GPT_URL);
       $selectedPromptTitle.textContent = null;
       $selectedPromptTitle.dataset.promptUuid = '';
       $textarea.placeholder = 'Send a message.';
       $textarea.style.height = 'fit-content';
+      $selectedPromptTitle.style.display = 'none';
       $cancelPromptButton.style.display = 'none';
     });
     $selectedPromptTitle.parentElement.appendChild($cancelPromptButton);
